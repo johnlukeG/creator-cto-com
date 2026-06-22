@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* ── Design tokens (dark theme — production default) ─────────────────────── */
+@theme {
+  --color-bg: #0e0f0d;
+  --color-bg-muted: #161815;
+  --color-bg-card: #181a17;
+  --color-ink: #f1ede4;
+  --color-ink-muted: #a4a097;
+  --color-ink-faint: rgba(241, 237, 228, 0.5);
+  --color-line: rgba(241, 237, 228, 0.14);
+  --color-line-soft: rgba(241, 237, 228, 0.07);
+  --color-accent: #4ad6a0;
+  --color-accent-ink: #06140e;
+  --color-chip: #f1ede4;
+  --color-chip-ink: #0e0f0d;
+
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  letter-spacing: -0.025em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Dot-grid background used by the page shell */
+.dot-grid {
+  background-image: radial-gradient(var(--color-line) 0.6px, transparent 0.6px);
+  background-size: 20px 20px;
+}
+
+/* Marquee + cursor blink (ported from the design prototype) */
+@keyframes ccto-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes ccto-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: ccto-marquee 38s linear infinite;
+}
+.animate-blink {
+  animation: ccto-blink 1s steps(2) infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+}

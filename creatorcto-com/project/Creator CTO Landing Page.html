@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Creator CTO — A channel for creators building AI-native products</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Martian+Mono:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  * { box-sizing: border-box; }
+  @keyframes cctoBlink { 50% { opacity: 0; } }
+  @keyframes cctoMarquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  /* Hide scrollbars but keep scrollable */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 5px; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="variants.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "density": "compact",
+  "type": "geist",
+  "dark": true,
+  "hero": "youtube",
+  "headline": "channel",
+  "videos": true,
+  "pillars": true,
+  "testimonials": true,
+  "faq": true,
+  "cta": true,
+  "footer": true
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tw, setTw] = useTweaks(TWEAK_DEFAULTS);
+
+  const t = tw.dark ? tokens.dark : tokens.light;
+  const d = densityMap[tw.density] || densityMap.regular;
+  const f = fontMap[tw.type]       || fontMap.geist;
+
+  const tweaks = {
+    hero:     tw.hero,
+    headline: tw.headline,
+    sections: {
+      videos:       tw.videos,
+      pillars:      tw.pillars,
+      testimonials: tw.testimonials,
+      faq:          tw.faq,
+      cta:          tw.cta,
+      footer:       tw.footer,
+    },
+  };
+
+  useEffect(() => {
+    document.body.style.background = t.bg;
+    document.body.style.color = t.ink;
+    document.body.style.fontFamily = f.body;
+    document.body.style.letterSpacing = f.tracking;
+  }, [t.bg, t.ink, f.body, f.tracking]);
+
+  return (
+    <div>
+      <VariantBold t={t} d={d} f={f} tweaks={tweaks} />
+
+      <TweaksPanel>
+        <TweakSection label="Layout" />
+        <TweakRadio
+          label="Density"
+          value={tw.density}
+          options={['compact', 'regular', 'comfy']}
+          onChange={(v) => setTw('density', v)}
+        />
+        <TweakSelect
+          label="Type pairing"
+          value={tw.type}
+          options={[
+            { value: 'jetbrains', label: 'JetBrains Mono' },
+            { value: 'martian',   label: 'Martian Mono' },
+            { value: 'geist',     label: 'Geist Mono' },
+          ]}
+          onChange={(v) => setTw('type', v)}
+        />
+        <TweakToggle
+          label="Dark mode"
+          value={tw.dark}
+          onChange={(v) => setTw('dark', v)}
+        />
+
+        <TweakSection label="Hero" />
+        <TweakSelect
+          label="Hero visual"
+          value={tw.hero}
+          options={[
+            { value: 'youtube',  label: 'YouTube player' },
+            { value: 'terminal', label: 'Build terminal' },
+            { value: 'flywheel', label: 'Creator flywheel' },
+            { value: 'stack',    label: 'Creator + product stack' },
+          ]}
+          onChange={(v) => setTw('hero', v)}
+        />
+        <TweakSelect
+          label="Headline copy"
+          value={tw.headline}
+          options={[
+            { value: 'channel',    label: 'Channel for builders' },
+            { value: 'transition', label: 'Creator → operator' },
+            { value: 'leverage',   label: 'Distribution / Ownership / Leverage' },
+            { value: 'flywheel',   label: 'Audience ↔ code flywheel' },
+          ]}
+          onChange={(v) => setTw('headline', v)}
+        />
+
+        <TweakSection label="Sections" />
+        <TweakToggle label="Videos"       value={tw.videos}       onChange={(v) => setTw('videos', v)} />
+        <TweakToggle label="Pillars"      value={tw.pillars}      onChange={(v) => setTw('pillars', v)} />
+        <TweakToggle label="Testimonials" value={tw.testimonials} onChange={(v) => setTw('testimonials', v)} />
+        <TweakToggle label="FAQ"          value={tw.faq}          onChange={(v) => setTw('faq', v)} />
+        <TweakToggle label="CTA block"    value={tw.cta}          onChange={(v) => setTw('cta', v)} />
+        <TweakToggle label="Footer"       value={tw.footer}       onChange={(v) => setTw('footer', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
