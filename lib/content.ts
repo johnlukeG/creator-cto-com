@@ -1,7 +1,7 @@
 // Landing-page content, lifted from the design prototype (components.jsx).
 
 export const LINKS = {
-  youtube: "https://youtube.com/@creatorcto",
+  youtube: "https://youtube.com/@creator-cto",
 };
 
 export const headline = {
