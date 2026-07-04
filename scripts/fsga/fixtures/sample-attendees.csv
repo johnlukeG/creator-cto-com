@@ -1,0 +1,7 @@
+external_id,name,company,title,email,linkedin_url,company_url,role_category,company_type,seniority,notes
+ext-001,Taylor Reed,Fictional Sports Co,VP Marketing,taylor@example-fake.com,,,marketing-content,media-content,vp,Sample row 1 - external_id present
+,Jamie Fox,Faux Fantasy Labs,,,https://linkedin.example/jamiefox,https://fauxfantasy.example,sales-partnerships,agency-services,director,Sample row 2 - no external_id; missing title/email
+ext-003,Morgan Vale,Not Real Analytics Inc,Head of Product,morgan@example-fake.com,,,product-ops,data-technology,head,Sample row 3 - external_id present
+,Casey Doe,Imaginary Ops Group,Recruiter,casey@example-fake.com,,,bogus-category,other,manager,Sample row 4 - invalid role_category on purpose
+ext-005,Riley Stone,Pretend League Media,Founder,riley@example-fake.com,,,executive-founder,team-league,founder,Sample row 5 - executive-founder
+,Jamie Fox,Faux Fantasy Labs,Senior Director,jamie@example-fake.com,https://linkedin.example/jamiefox,https://fauxfantasy.example,sales-partnerships,agency-services,senior director,Sample row 6 - duplicate of row 2's natural key (name+company); exercises the update path
