@@ -1022,7 +1022,7 @@ export const SKILLS: Skill[] = [
     starterPrompt:
       "Triage my inbox. Here are the emails/messages I'm behind on — sender, subject, and the gist of each: [PASTE]. Sort them into: (1) Urgent + needs me — reply or act today, with the specific action for each; (2) Delegate — who it should go to and a one-line handoff; (3) Quick replies — ones I can clear in under 2 minutes, with a suggested short response drafted for each; (4) Read later / FYI; (5) Archive/ignore. For the urgent items, order them by real consequence, not loudness. Draft the quick replies in a [warm but efficient] tone so I can send them fast. Flag anything that looks time-sensitive or where I might be missing context as [CHECK].",
     difficulty: "starter",
-    riskLevel: "low",
+    riskLevel: "medium",
     tags: ["productivity", "email", "triage"],
   },
   {
@@ -1106,7 +1106,7 @@ export const SKILLS: Skill[] = [
     starterPrompt:
       "Help me stay on top of my professional relationships. Here's a list of important contacts and when I last connected with each, plus any context: [PASTE — name, company, last touch, notes]. Produce a follow-up plan: (1) who I'm overdue to reach out to, ranked by relationship importance and time since last contact; (2) for each, a specific, non-generic reason to reconnect now — their news, a shared interest, a relevant intro, or a genuine check-in; (3) a one-line opener I could actually send; (4) a suggested cadence for keeping each relationship warm going forward. Prioritize genuine value over transactional 'just checking in' spam. Group them into this week / this month / this quarter so it feels doable, not overwhelming.",
     difficulty: "starter",
-    riskLevel: "low",
+    riskLevel: "medium",
     tags: ["productivity", "networking", "follow-up"],
   },
   {
