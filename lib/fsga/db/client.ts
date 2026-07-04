@@ -22,9 +22,12 @@ export function getDb(): Db {
   const client = postgres(process.env.POSTGRES_URL!, { prepare: false, max: 1 });
   const db = drizzle(client, { schema });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForFsgaDb.__fsgaDb = db;
-  }
+  // Cache unconditionally: the globalThis indirection exists for dev HMR,
+  // but the client must be reused in production too — otherwise every
+  // getDb() call opens a fresh postgres.js pool that's never closed,
+  // leaking connections against the Supabase pooler under warm serverless
+  // traffic.
+  globalForFsgaDb.__fsgaDb = db;
 
   return db;
 }
