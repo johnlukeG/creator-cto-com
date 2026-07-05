@@ -1,32 +1,65 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { Section } from "@/components/section";
+import { PackView } from "@/components/fsga/pack-view";
+import { getPublicPackBySlug } from "@/lib/fsga/db/queries";
 
 export const revalidate = 60;
 
-// Real DB fetch (attendee + skill pack + items by publicSlug) lands in Task 4.
+// Wrapped in React's request-scoped cache() so generateMetadata and the page
+// body share one DB round trip instead of two.
+const fetchPack = cache(async (slug: string) => {
+  try {
+    return { pack: await getPublicPackBySlug(slug), error: false as const };
+  } catch (err) {
+    console.error(`fsga pack page: DB error fetching slug "${slug}"`, err);
+    return { pack: null, error: true as const };
+  }
+});
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const { pack } = await fetchPack(slug);
+
+  return {
+    title: pack ? `${pack.attendee.name}'s AI Skill Pack` : "AI Skill Pack",
+    robots: { index: false, follow: false },
+  };
+}
+
 export default async function SkillPackPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const { pack, error } = await fetchPack(slug);
 
-  if (slug !== "demo") {
+  if (error) {
+    return (
+      <Section pad="normal">
+        <div className="max-w-[480px] mx-auto text-center bg-bg-card border border-line rounded-[18px] p-7">
+          <h1 className="text-[20px] font-bold tracking-tight">Temporarily unavailable</h1>
+          <p className="text-[13px] text-ink-muted mt-2.5 leading-[1.6]">
+            We couldn&rsquo;t load this pack right now — try again in a minute.
+          </p>
+        </div>
+      </Section>
+    );
+  }
+
+  if (!pack) {
     notFound();
   }
 
   return (
     <Section pad="normal">
-      <div className="max-w-[640px] mx-auto bg-bg-card border border-line rounded-[18px] p-7">
-        <div className="text-[10px] tracking-[0.1em] uppercase text-accent">/ skill pack</div>
-        <h1 className="text-[28px] font-bold tracking-[-0.03em] mt-3.5 leading-[1.1] text-balance">
-          Demo Skill Pack
-        </h1>
-        <p className="text-[13px] text-ink-muted mt-3 leading-[1.6]">
-          Placeholder pack for slug <code>demo</code>. Real attendee data, generated summary, and ranked
-          skill items load from the database starting in Task 4.
-        </p>
-      </div>
+      <PackView pack={pack} />
     </Section>
   );
 }
