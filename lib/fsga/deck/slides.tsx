@@ -7,17 +7,16 @@
 // DeckShell scales the whole box to fit whatever screen it's projected on,
 // so pixel sizes below are absolute *stage* coordinates, not real screen px.
 //
-// One local hook (useFitScale, for the teardown slide's embedded SkillCard)
-// uses React state — harmless without its own 'use client' since this module
-// is only ever reached through deck-shell.tsx's client boundary, but the
-// directive is added anyway for clarity given the hook usage.
+// Hook-free since the teardown slide went slide-native (TeardownCard is
+// authored in stage pixels, no fit-scaling) — the 'use client' directive is
+// kept because this module is only ever reached through deck-shell.tsx's
+// client boundary anyway, and render functions here are client-side JSX.
 
-import { useRef, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Pill } from "@/components/atoms";
-import { SkillCard } from "@/components/fsga/skill-card";
 import { PackSlideCard } from "@/components/fsga/deck/pack-slide-card";
 import { QrBlock } from "@/components/fsga/deck/qr-block";
-import { useIsomorphicLayoutEffect } from "@/components/fsga/deck/use-isomorphic-layout-effect";
+import { TeardownCard } from "@/components/fsga/deck/teardown-card";
 import { getSkillBySlug } from "../skills/library";
 import { DECK_SLIDES, TEARDOWN_SKILL_SLUG, type SlideContent } from "./deck-content";
 import type { SlideContext, SlideDef } from "./types";
@@ -262,35 +261,13 @@ function PacksSlide({ content, ctx }: { content: SlideContent; ctx: SlideContext
   );
 }
 
-// Fit-to-container scaler for the teardown slide's embedded SkillCard.
-// Measures the overflow-hidden container's real height instead of trusting a
-// hardcoded budget: the old 700px constant overshot the container's actual
-// ~623px at the 1080p stage, so the card's bottom ~76px was clipped by the
-// container's own overflow-hidden. clientHeight/scrollHeight are
-// pre-transform layout metrics, so both reads are true 1920×1080 stage
-// pixels even inside DeckShell's scaled stage — and they stay measurable for
-// visibility:hidden slides (unlike display:none), so the always-mounted
-// inactive slides measure correctly too. Falls back to `fallbackMaxHeight`
-// if the container measurement is unavailable.
-function useFitScale(fallbackMaxHeight: number) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const [scale, setScale] = useState(1);
-
-  useIsomorphicLayoutEffect(() => {
-    const content = contentRef.current;
-    if (!content) return;
-    const budget = containerRef.current?.clientHeight || fallbackMaxHeight;
-    const natural = content.scrollHeight;
-    setScale(natural > budget ? budget / natural : 1);
-  }, [fallbackMaxHeight]);
-
-  return { containerRef, contentRef, scale };
-}
-
+// Slide-native teardown: renders the same Skill object as projection-scale
+// chrome (TeardownCard) instead of embedding the web-scale SkillCard — the
+// embedded card's 10-19px type projected at ~8-16px after fit-scaling,
+// unreadable from a ballroom. The fit-scale hook this slide used to need is
+// gone with it: TeardownCard is authored directly in stage pixels.
 function TeardownSlide({ content }: { content: SlideContent }) {
   const skill = getSkillBySlug(TEARDOWN_SKILL_SLUG);
-  const { containerRef, contentRef, scale } = useFitScale(620);
 
   return (
     <SlideFrame eyebrow={content.eyebrow}>
@@ -299,12 +276,8 @@ function TeardownSlide({ content }: { content: SlideContent }) {
       </h2>
       {content.body && <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>}
       {skill ? (
-        <div ref={containerRef} className="flex-1 min-h-0 flex items-start justify-center mt-6 overflow-hidden">
-          <div style={{ transform: `scale(${scale})`, transformOrigin: "top center", width: 1100 }}>
-            <div ref={contentRef}>
-              <SkillCard skill={skill} />
-            </div>
-          </div>
+        <div className="flex-1 min-h-0 mt-6">
+          <TeardownCard skill={skill} />
         </div>
       ) : (
         // Defensive only: deck-content.ts already fails fast at import if
