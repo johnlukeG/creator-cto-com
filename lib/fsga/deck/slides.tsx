@@ -234,8 +234,13 @@ function QrSlide({ content }: { content: SlideContent }) {
   );
 }
 
+// Three packs, one row. A 2×2 grid of 4 packs cannot fit at 1080p with the
+// ≥28px skill-row / ≥32px name legibility floors: each 5-row card needs
+// ~330px+ even with intro dropped and paddings crushed, but a 2-row grid
+// only offers ~300px per row inside the frame's ~620px budget. One row of
+// three gives every card the full budget — 3 legible > 4 clipped.
 function PacksSlide({ content, ctx }: { content: SlideContent; ctx: SlideContext }) {
-  const packs = ctx.featuredPacks.slice(0, 4);
+  const packs = ctx.featuredPacks.slice(0, 3);
   return (
     <SlideFrame eyebrow={content.eyebrow}>
       <h2 className="text-[58px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
@@ -243,7 +248,7 @@ function PacksSlide({ content, ctx }: { content: SlideContent; ctx: SlideContext
       </h2>
       {content.body && <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>}
       {packs.length > 0 ? (
-        <div className="flex-1 min-h-0 grid grid-cols-2 gap-6 mt-6">
+        <div className="flex-1 min-h-0 grid grid-cols-3 gap-6 mt-8 content-start">
           {packs.map((pack) => (
             <PackSlideCard key={pack.slug} pack={pack} />
           ))}
