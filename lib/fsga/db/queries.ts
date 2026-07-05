@@ -8,7 +8,15 @@
 
 import { and, asc, eq, gte, ilike, inArray, or, sql } from "drizzle-orm";
 import { getDb } from "./client";
-import { attendees, generatedSkillIdeas, leads, skillPackItems, skillPacks, type PackStatus } from "./schema";
+import {
+  attendees,
+  generatedSkillIdeas,
+  leads,
+  PACK_STATUSES,
+  skillPackItems,
+  skillPacks,
+  type PackStatus,
+} from "./schema";
 
 const VISIBLE_STATUSES: PackStatus[] = ["approved", "featured_for_demo"];
 
@@ -231,4 +239,201 @@ export async function countRecentGenerations(ipHash: string, windowMinutes: numb
 export async function insertGeneratedSkillIdea(data: typeof generatedSkillIdeas.$inferInsert): Promise<void> {
   const db = getDb();
   await db.insert(generatedSkillIdeas).values(data);
+}
+
+// ─── Admin (app/fsga/admin/**) ───────────────────────────────────────────
+//
+// Unlike every query above, these are NOT status-filtered — the presenter
+// reviewing packs before the event needs to see and edit every status,
+// including the ones the public site must never surface. Never add `email`
+// to any admin select: the admin UI must not render attendee emails (see
+// task brief security notes).
+
+export interface AdminPackListItem {
+  attendee: {
+    name: string;
+    company: string;
+    title: string | null;
+    roleCategory: string | null;
+    publicSlug: string;
+  };
+  pack: {
+    id: string;
+    status: PackStatus;
+    featuredForDemo: boolean;
+    updatedAt: Date;
+    customIntro: string | null;
+    title: string | null;
+    summary: string | null;
+  };
+}
+
+/** All packs (every status), attendee name/company/role only — no email. For the admin table. */
+export async function adminListPacks(): Promise<AdminPackListItem[]> {
+  const db = getDb();
+
+  const rows = await db
+    .select({
+      name: attendees.name,
+      company: attendees.company,
+      title: attendees.title,
+      roleCategory: attendees.roleCategory,
+      publicSlug: attendees.publicSlug,
+      packId: skillPacks.id,
+      status: skillPacks.status,
+      featuredForDemo: skillPacks.featuredForDemo,
+      updatedAt: skillPacks.updatedAt,
+      customIntro: skillPacks.customIntro,
+      packTitle: skillPacks.title,
+      summary: skillPacks.summary,
+    })
+    .from(attendees)
+    .innerJoin(skillPacks, eq(skillPacks.attendeeId, attendees.id))
+    .orderBy(asc(attendees.name));
+
+  return rows.map((row) => ({
+    attendee: {
+      name: row.name,
+      company: row.company,
+      title: row.title,
+      roleCategory: row.roleCategory,
+      publicSlug: row.publicSlug,
+    },
+    pack: {
+      id: row.packId,
+      status: row.status as PackStatus,
+      featuredForDemo: row.featuredForDemo,
+      updatedAt: row.updatedAt,
+      customIntro: row.customIntro,
+      title: row.packTitle,
+      summary: row.summary,
+    },
+  }));
+}
+
+export interface AdminPackItem {
+  id: string;
+  skillSlug: string;
+  rank: number;
+  customReason: string | null;
+  recommendedFirst: boolean;
+}
+
+export interface AdminPackDetail {
+  attendee: {
+    name: string;
+    company: string;
+    title: string | null;
+    roleCategory: string | null;
+    publicSlug: string;
+  };
+  pack: {
+    id: string;
+    title: string | null;
+    summary: string | null;
+    rationale: string | null;
+    customIntro: string | null;
+    status: PackStatus;
+    featuredForDemo: boolean;
+    updatedAt: Date;
+  };
+  items: AdminPackItem[];
+}
+
+/** Full pack + attendee + items for one pack, any status, by pack id. For the admin edit page. */
+export async function adminGetPack(packId: string): Promise<AdminPackDetail | null> {
+  const db = getDb();
+
+  const [row] = await db
+    .select({
+      name: attendees.name,
+      company: attendees.company,
+      title: attendees.title,
+      roleCategory: attendees.roleCategory,
+      publicSlug: attendees.publicSlug,
+      packId: skillPacks.id,
+      packTitle: skillPacks.title,
+      summary: skillPacks.summary,
+      rationale: skillPacks.rationale,
+      customIntro: skillPacks.customIntro,
+      status: skillPacks.status,
+      featuredForDemo: skillPacks.featuredForDemo,
+      updatedAt: skillPacks.updatedAt,
+    })
+    .from(skillPacks)
+    .innerJoin(attendees, eq(skillPacks.attendeeId, attendees.id))
+    .where(eq(skillPacks.id, packId))
+    .limit(1);
+
+  if (!row) return null;
+
+  const items = await db
+    .select({
+      id: skillPackItems.id,
+      skillSlug: skillPackItems.skillSlug,
+      rank: skillPackItems.rank,
+      customReason: skillPackItems.customReason,
+      recommendedFirst: skillPackItems.recommendedFirst,
+    })
+    .from(skillPackItems)
+    .where(eq(skillPackItems.packId, row.packId))
+    .orderBy(asc(skillPackItems.rank));
+
+  return {
+    attendee: {
+      name: row.name,
+      company: row.company,
+      title: row.title,
+      roleCategory: row.roleCategory,
+      publicSlug: row.publicSlug,
+    },
+    pack: {
+      id: row.packId,
+      title: row.packTitle,
+      summary: row.summary,
+      rationale: row.rationale,
+      customIntro: row.customIntro,
+      status: row.status as PackStatus,
+      featuredForDemo: row.featuredForDemo,
+      updatedAt: row.updatedAt,
+    },
+    items,
+  };
+}
+
+/** Transition a pack's status. Throws on an unrecognized status rather than silently no-op'ing. */
+export async function adminUpdatePackStatus(packId: string, status: PackStatus): Promise<void> {
+  if (!(PACK_STATUSES as readonly string[]).includes(status)) {
+    throw new Error(`adminUpdatePackStatus: invalid status "${status}"`);
+  }
+
+  const db = getDb();
+  await db
+    .update(skillPacks)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(skillPacks.id, packId));
+}
+
+/** Toggle (set) the featuredForDemo flag — independent of `status` (see schema.ts). */
+export async function adminToggleFeatured(packId: string, featured: boolean): Promise<void> {
+  const db = getDb();
+  await db
+    .update(skillPacks)
+    .set({ featuredForDemo: featured, updatedAt: new Date() })
+    .where(eq(skillPacks.id, packId));
+}
+
+export interface AdminPackTextUpdate {
+  title?: string | null;
+  summary?: string | null;
+  customIntro?: string | null;
+}
+
+/** Update the presenter-editable text fields on a pack. */
+export async function adminUpdatePackText(packId: string, data: AdminPackTextUpdate): Promise<void> {
+  const db = getDb();
+  await db
+    .update(skillPacks)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(skillPacks.id, packId));
 }
