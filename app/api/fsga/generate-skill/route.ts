@@ -18,6 +18,8 @@ import { getClientIp, hashIp } from "@/lib/fsga/rate-limit";
 import { GenerateInputSchema, type GenerateInput, type SkillIdea } from "@/lib/fsga/skill-idea";
 import { templateSkillIdea } from "@/lib/fsga/template-fallback";
 
+export const maxDuration = 60;
+
 // The global spend cap (GENERATION_CAP in lib/fsga/config.ts) is enforced by
 // the counters row itself (see tryIncrementGenerationCounter's `WHERE count
 // < cap`), not re-checked here — this route only reacts to true/false.
