@@ -61,6 +61,10 @@ export default async function AdminPackEditPage({ params }: { params: Promise<{ 
         </a>
       </div>
 
+      <p className="text-[12px] text-ink-faint">
+        The deck shows packs that are ★ featured AND status approved/featured_for_demo.
+      </p>
+
       <div>
         <p className="text-[11px] uppercase tracking-[0.04em] text-ink-muted mb-2">Status</p>
         <div className="flex flex-wrap gap-2">
