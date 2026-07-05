@@ -17,9 +17,9 @@ export const SkillIdeaSchema = z.object({
 export type SkillIdea = z.infer<typeof SkillIdeaSchema>;
 
 export const GenerateInputSchema = z.object({
-  repeatedTask: z.string().min(1).max(300),
-  inputType: z.string().min(1).max(300),
-  outputType: z.string().min(1).max(300),
-  successGoal: z.string().min(1).max(300),
+  repeatedTask: z.string().trim().min(1).max(300),
+  inputType: z.string().trim().min(1).max(300),
+  outputType: z.string().trim().min(1).max(300),
+  successGoal: z.string().trim().min(1).max(300),
 });
 export type GenerateInput = z.infer<typeof GenerateInputSchema>;

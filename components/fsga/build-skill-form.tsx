@@ -82,6 +82,7 @@ export function BuildSkillForm({
             value={form.repeatedTask}
             onChange={(e) => update("repeatedTask", e.target.value)}
             placeholder="e.g. writing the weekly pipeline summary"
+            maxLength={300}
           />
         </Field>
         <Field label="Input type">
@@ -89,6 +90,7 @@ export function BuildSkillForm({
             value={form.inputType}
             onChange={(e) => update("inputType", e.target.value)}
             placeholder="e.g. a raw CRM export"
+            maxLength={300}
           />
         </Field>
         <Field label="Output type">
@@ -96,6 +98,7 @@ export function BuildSkillForm({
             value={form.outputType}
             onChange={(e) => update("outputType", e.target.value)}
             placeholder="e.g. a clean weekly summary"
+            maxLength={300}
           />
         </Field>
         <Field label="Success goal">
@@ -104,6 +107,7 @@ export function BuildSkillForm({
             onChange={(e) => update("successGoal", e.target.value)}
             placeholder="e.g. leadership reads it without follow-up questions"
             rows={2}
+            maxLength={300}
           />
         </Field>
       </div>

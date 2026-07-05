@@ -43,10 +43,10 @@ function getClient(): Anthropic | null {
 
 /** Calls the model for a structured skill idea. Never throws — returns null on any failure. */
 export async function generateSkillIdea(input: GenerateInput): Promise<SkillIdea | null> {
-  const client = getClient();
-  if (!client) return null;
-
   try {
+    const client = getClient();
+    if (!client) return null;
+
     const response = await client.messages.parse(
       {
         model: MODEL,
