@@ -4,11 +4,17 @@
 // sentence is the pedagogical point: attendees see their own workflow
 // collapse into the turn-X-into-Y-so-that-Z shape a Skill formalizes.
 //
-// The AI draft button is intentionally inert here — Task 7 wires it to the
-// generate-skill endpoint. Keep the handler shape ready (onDraftWithAi prop)
-// so that wiring is additive, not a rewrite.
+// "Draft my Skill with AI" always succeeds from the attendee's point of
+// view: it posts to /api/fsga/generate-skill (which itself never 5xxs and
+// degrades to a template draft under cap/rate-limit/AI failure), and if the
+// request itself can't even complete (offline, DNS, etc.) this component
+// falls back to the same pure templateSkillIdea() the server uses — so the
+// draft never depends on network reachability being perfect.
 
 import { useState, type FormEvent } from "react";
+import { Pill } from "@/components/atoms";
+import type { SkillIdea } from "@/lib/fsga/skill-idea";
+import { templateSkillIdea } from "@/lib/fsga/template-fallback";
 import { BtnButton, Field, TextArea, TextInput } from "./atoms";
 
 interface BuildSkillFormState {
@@ -32,9 +38,40 @@ export function BuildSkillForm({
 }) {
   const [form, setForm] = useState<BuildSkillFormState>(EMPTY_STATE);
   const hasAnyContent = Object.values(form).some((v) => v.trim().length > 0);
+  const allFieldsFilled = Object.values(form).every((v) => v.trim().length > 0);
+
+  const [draftStatus, setDraftStatus] = useState<"idle" | "drafting" | "done">("idle");
+  const [draft, setDraft] = useState<SkillIdea | null>(null);
+  const [draftSource, setDraftSource] = useState<"ai" | "template" | null>(null);
 
   function update<K extends keyof BuildSkillFormState>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  async function handleDraftWithAi() {
+    if (!allFieldsFilled || draftStatus === "drafting") return;
+    onDraftWithAi?.(form);
+    setDraftStatus("drafting");
+
+    try {
+      const res = await fetch("/api/fsga/generate-skill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.idea) throw new Error("generate-skill request failed");
+      setDraft(data.idea as SkillIdea);
+      setDraftSource(data.source === "ai" ? "ai" : "template");
+    } catch {
+      // Request itself failed (offline, timeout, non-JSON) — fall back to
+      // the same pure template function the server uses, so the attendee
+      // still leaves with a draft no matter what.
+      setDraft(templateSkillIdea(form));
+      setDraftSource("template");
+    } finally {
+      setDraftStatus("done");
+    }
   }
 
   return (
@@ -90,14 +127,54 @@ export function BuildSkillForm({
       )}
 
       <div className="flex items-center gap-3 flex-wrap">
-        {/* TODO(Task 7): wire onClick to the AI generate-skill endpoint once it exists. */}
-        <BtnButton type="button" disabled onClick={() => onDraftWithAi?.(form)}>
-          Draft my Skill with AI
+        <BtnButton
+          type="button"
+          disabled={!allFieldsFilled || draftStatus === "drafting"}
+          onClick={handleDraftWithAi}
+        >
+          {draftStatus === "drafting" ? "Drafting…" : "Draft my Skill with AI"}
         </BtnButton>
-        <span className="text-[11px] text-ink-faint">(coming at the live workshop)</span>
       </div>
 
+      {draft && <SkillDraftCard idea={draft} source={draftSource ?? "template"} />}
+
       <LeadCaptureSection formState={form} />
+    </div>
+  );
+}
+
+// Mini card idiom borrowed from SkillCard (components/fsga/skill-card.tsx)
+// but deliberately not that component — this renders a single ad hoc draft,
+// not a catalog Skill with category/difficulty/starter-prompt metadata.
+function SkillDraftCard({ idea, source }: { idea: SkillIdea; source: "ai" | "template" }) {
+  return (
+    <div className="bg-bg-card border border-line rounded-[18px] p-5 grid gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <h4 className="font-bold tracking-[-0.03em] text-[16px] leading-tight mr-auto">{idea.skill_name}</h4>
+        <Pill variant={source === "ai" ? "accent" : "outline"}>
+          {source === "ai" ? "drafted by AI" : "template draft"}
+        </Pill>
+      </div>
+
+      <p className="text-[13px] text-ink-muted leading-[1.6]">{idea.description}</p>
+
+      <DraftSection label="Inputs" items={idea.inputs} ordered={false} />
+      <DraftSection label="Process" items={idea.process_steps} ordered />
+      <DraftSection label="Outputs" items={idea.outputs} ordered={false} />
+    </div>
+  );
+}
+
+function DraftSection({ label, items, ordered }: { label: string; items: string[]; ordered: boolean }) {
+  const ListTag = ordered ? "ol" : "ul";
+  return (
+    <div>
+      <div className="text-[10px] tracking-[0.08em] uppercase text-ink-faint mb-1.5">{label}</div>
+      <ListTag className={`${ordered ? "list-decimal" : "list-disc"} pl-4 grid gap-1 text-[13px] text-ink-muted leading-[1.6]`}>
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ListTag>
     </div>
   );
 }
