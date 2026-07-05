@@ -267,6 +267,7 @@ function LeadCaptureForm({ role, pain }: { role: RoleCategory; pain: WorkflowPai
           role,
           workflowInterest: pain ?? undefined,
           subscribe,
+          requestedPackCopy: true,
           source: "starter_flow",
           website,
         }),
