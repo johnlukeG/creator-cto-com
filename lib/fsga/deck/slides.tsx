@@ -262,23 +262,35 @@ function PacksSlide({ content, ctx }: { content: SlideContent; ctx: SlideContext
   );
 }
 
-function useFitScale(maxHeight: number) {
-  const ref = useRef<HTMLDivElement | null>(null);
+// Fit-to-container scaler for the teardown slide's embedded SkillCard.
+// Measures the overflow-hidden container's real height instead of trusting a
+// hardcoded budget: the old 700px constant overshot the container's actual
+// ~623px at the 1080p stage, so the card's bottom ~76px was clipped by the
+// container's own overflow-hidden. clientHeight/scrollHeight are
+// pre-transform layout metrics, so both reads are true 1920×1080 stage
+// pixels even inside DeckShell's scaled stage — and they stay measurable for
+// visibility:hidden slides (unlike display:none), so the always-mounted
+// inactive slides measure correctly too. Falls back to `fallbackMaxHeight`
+// if the container measurement is unavailable.
+function useFitScale(fallbackMaxHeight: number) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
 
   useIsomorphicLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const natural = el.scrollHeight;
-    setScale(natural > maxHeight ? maxHeight / natural : 1);
-  }, [maxHeight]);
+    const content = contentRef.current;
+    if (!content) return;
+    const budget = containerRef.current?.clientHeight || fallbackMaxHeight;
+    const natural = content.scrollHeight;
+    setScale(natural > budget ? budget / natural : 1);
+  }, [fallbackMaxHeight]);
 
-  return { ref, scale };
+  return { containerRef, contentRef, scale };
 }
 
 function TeardownSlide({ content }: { content: SlideContent }) {
   const skill = getSkillBySlug(TEARDOWN_SKILL_SLUG);
-  const { ref, scale } = useFitScale(700);
+  const { containerRef, contentRef, scale } = useFitScale(620);
 
   return (
     <SlideFrame eyebrow={content.eyebrow}>
@@ -287,9 +299,9 @@ function TeardownSlide({ content }: { content: SlideContent }) {
       </h2>
       {content.body && <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>}
       {skill ? (
-        <div className="flex-1 min-h-0 flex items-start justify-center mt-6 overflow-hidden">
+        <div ref={containerRef} className="flex-1 min-h-0 flex items-start justify-center mt-6 overflow-hidden">
           <div style={{ transform: `scale(${scale})`, transformOrigin: "top center", width: 1100 }}>
-            <div ref={ref}>
+            <div ref={contentRef}>
               <SkillCard skill={skill} />
             </div>
           </div>
