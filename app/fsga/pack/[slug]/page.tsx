@@ -10,6 +10,11 @@ export const revalidate = 60;
 // Wrapped in React's request-scoped cache() so generateMetadata and the page
 // body share one DB round trip instead of two.
 const fetchPack = cache(async (slug: string) => {
+  // Deliberate trade-off: catching DB errors here means a failed ISR
+  // revalidation caches the "temporarily unavailable" card for revalidate
+  // seconds instead of serving the stale good page. Accepted for the event
+  // (cold-render UX beats a crash; warm script pre-populates cache). Revisit
+  // post-event.
   try {
     return { pack: await getPublicPackBySlug(slug), error: false as const };
   } catch (err) {
