@@ -8,21 +8,16 @@
 // /fsga/presenter and /fsga/static get the same full-bleed treatment just by
 // rendering <DeckShell /> with nothing else in the page body.
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SLIDES } from "@/lib/fsga/deck/slides";
 import type { FeaturedPackData } from "@/lib/fsga/deck/types";
 import { NotesPanel } from "./notes-panel";
 import { Progress } from "./progress";
+import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect";
 
 const SLIDE_COUNT = SLIDES.length;
 const STAGE_WIDTH = 1920;
 const STAGE_HEIGHT = 1080;
-
-// useLayoutEffect warns when it runs during SSR ("does nothing on the
-// server"). DeckShell IS server-rendered (both /fsga/presenter, dynamically,
-// and /fsga/static, at build time) before hydration takes over, so guard
-// with the standard isomorphic-effect fallback rather than eating the noise.
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 function clampIndex(i: number): number {
   return Math.min(Math.max(i, 0), SLIDE_COUNT - 1);
@@ -99,12 +94,19 @@ export function DeckShell({
     };
   }, []);
 
-  const navigate = useCallback((next: number) => {
-    const clamped = clampIndex(next);
-    setIndex(clamped);
-    window.history.replaceState(null, "", `#${clamped}`);
-    setStartedAt((prev) => prev ?? Date.now());
-  }, []);
+  const navigate = useCallback(
+    (next: number) => {
+      const clamped = clampIndex(next);
+      setIndex(clamped);
+      window.history.replaceState(null, "", `#${clamped}`);
+      // Only start the timer on an actual slide change — a clamped no-op
+      // (e.g. ArrowLeft on slide 0) must not start the clock.
+      if (clamped !== index) {
+        setStartedAt((prev) => prev ?? Date.now());
+      }
+    },
+    [index],
+  );
 
   const resetTimer = useCallback(() => {
     setStartedAt(Date.now());

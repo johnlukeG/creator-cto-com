@@ -12,11 +12,12 @@
 // is only ever reached through deck-shell.tsx's client boundary, but the
 // directive is added anyway for clarity given the hook usage.
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Pill } from "@/components/atoms";
 import { SkillCard } from "@/components/fsga/skill-card";
 import { PackSlideCard } from "@/components/fsga/deck/pack-slide-card";
 import { QrBlock } from "@/components/fsga/deck/qr-block";
+import { useIsomorphicLayoutEffect } from "@/components/fsga/deck/use-isomorphic-layout-effect";
 import { getSkillBySlug } from "../skills/library";
 import { DECK_SLIDES, TEARDOWN_SKILL_SLUG, type SlideContent } from "./deck-content";
 import type { SlideContext, SlideDef } from "./types";
@@ -242,7 +243,7 @@ function PacksSlide({ content, ctx }: { content: SlideContent; ctx: SlideContext
       </h2>
       {content.body && <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>}
       {packs.length > 0 ? (
-        <div className="flex-1 min-h-0 grid grid-cols-2 gap-8 mt-10">
+        <div className="flex-1 min-h-0 grid grid-cols-2 gap-6 mt-6">
           {packs.map((pack) => (
             <PackSlideCard key={pack.slug} pack={pack} />
           ))}
@@ -260,7 +261,7 @@ function useFitScale(maxHeight: number) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = useState(1);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     const natural = el.scrollHeight;

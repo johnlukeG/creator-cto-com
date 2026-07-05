@@ -28,30 +28,30 @@ export function PackSlideCard({ pack }: { pack: FeaturedPackData }) {
     .slice(0, 5);
 
   return (
-    <div className="bg-bg-card border border-line rounded-[18px] p-8 flex flex-col gap-4 h-full">
+    <div className="bg-bg-card border border-line rounded-[18px] p-6 flex flex-col gap-3 h-full">
       <div>
-        <div className="text-[26px] font-bold tracking-[-0.02em] text-ink leading-tight">
+        <div className="text-[32px] font-bold tracking-[-0.02em] text-ink leading-tight">
           {pack.attendeeName}
         </div>
-        <div className="text-[18px] text-ink-muted mt-1.5">
+        <div className="text-[18px] text-ink-muted mt-1">
           {pack.company}
           {pack.title ? ` · ${pack.title}` : ""}
         </div>
       </div>
 
       {pack.customIntro && (
-        <p className="text-[16px] text-ink-muted leading-[1.5] line-clamp-1">{pack.customIntro}</p>
+        <p className="text-[16px] text-ink-muted leading-[1.4] line-clamp-1">{pack.customIntro}</p>
       )}
 
-      <div className="grid gap-2.5 mt-1">
+      <div className="grid gap-2 mt-1">
         {rows.map(({ skill, recommendedFirst }) => (
           <div
             key={skill.slug}
-            className={`flex items-center justify-between gap-3 rounded-xl px-4 py-3 ${
+            className={`flex items-center justify-between gap-3 rounded-xl px-4 py-2 ${
               recommendedFirst ? "bg-accent/10 border border-accent" : "bg-bg-muted border border-line-soft"
             }`}
           >
-            <span className="text-[19px] text-ink leading-tight">{skill.name}</span>
+            <span className="text-[28px] text-ink leading-tight">{skill.name}</span>
             {recommendedFirst && (
               <span className="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full text-[11px] tracking-[0.06em] uppercase font-medium bg-accent text-accent-ink">
                 start here

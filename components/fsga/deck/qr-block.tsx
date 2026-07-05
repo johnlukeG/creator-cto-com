@@ -13,7 +13,7 @@ import { QR_URL } from "@/lib/fsga/config";
 const DISPLAY_URL = "creatorcto.com/fsga";
 
 export function QrBlock({ size = 520 }: { size?: number }) {
-  const urlFontSize = Math.max(20, Math.round(size * 0.065));
+  const urlFontSize = Math.max(28, Math.round(size * 0.065));
 
   return (
     <div className="bg-chip rounded-[24px] p-8 flex flex-col items-center gap-5 w-fit">
