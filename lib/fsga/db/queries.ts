@@ -161,6 +161,7 @@ export async function getFeaturedPacks(): Promise<FeaturedPack[]> {
     .from(attendees)
     .innerJoin(skillPacks, eq(skillPacks.attendeeId, attendees.id))
     .where(and(eq(skillPacks.featuredForDemo, true), inArray(skillPacks.status, VISIBLE_STATUSES)))
+    .orderBy(asc(attendees.name))
     .limit(5);
 
   if (rows.length === 0) return [];
