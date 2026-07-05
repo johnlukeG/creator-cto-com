@@ -52,7 +52,7 @@ export function SkillCard({
         {typeof rank === "number" && (
           <span className="text-[11px] text-ink-faint font-mono shrink-0">#{rank}</span>
         )}
-        <h3 className="font-bold tracking-tight text-[18px] sm:text-[19px] leading-tight mr-auto">
+        <h3 className="font-bold tracking-[-0.03em] text-[18px] sm:text-[19px] leading-tight mr-auto">
           {skill.name}
         </h3>
         <Pill variant="outline">{CATEGORY_LABELS[skill.category]}</Pill>

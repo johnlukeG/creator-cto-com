@@ -44,7 +44,7 @@ export default async function SkillPackPage({
     return (
       <Section pad="normal">
         <div className="max-w-[480px] mx-auto text-center bg-bg-card border border-line rounded-[18px] p-7">
-          <h1 className="text-[20px] font-bold tracking-tight">Temporarily unavailable</h1>
+          <h1 className="text-[20px] font-bold tracking-[-0.03em]">Temporarily unavailable</h1>
           <p className="text-[13px] text-ink-muted mt-2.5 leading-[1.6]">
             We couldn&rsquo;t load this pack right now — try again in a minute.
           </p>

@@ -26,7 +26,7 @@ export default function FsgaHomePage() {
             href="/fsga/starter"
             className="bg-bg-card border border-line rounded-[18px] p-5 text-left no-underline hover:border-accent transition-colors block"
           >
-            <div className="text-[13px] font-bold tracking-tight text-ink">Not on the attendee list?</div>
+            <div className="text-[13px] font-bold tracking-[-0.03em] text-ink">Not on the attendee list?</div>
             <div className="text-[12px] text-ink-muted mt-1.5 leading-[1.5]">
               Answer 3 quick questions and get a starter Skill Pack.
             </div>
@@ -35,7 +35,7 @@ export default function FsgaHomePage() {
             href="/fsga/build-your-own"
             className="bg-bg-card border border-line rounded-[18px] p-5 text-left no-underline hover:border-accent transition-colors block"
           >
-            <div className="text-[13px] font-bold tracking-tight text-ink">Build your first Skill</div>
+            <div className="text-[13px] font-bold tracking-[-0.03em] text-ink">Build your first Skill</div>
             <div className="text-[12px] text-ink-muted mt-1.5 leading-[1.5]">
               Turn one repeated task into a Skill, from scratch.
             </div>

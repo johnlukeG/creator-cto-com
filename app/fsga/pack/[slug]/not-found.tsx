@@ -6,7 +6,7 @@ export default function PackNotFound() {
   return (
     <Section pad="normal">
       <div className="max-w-[480px] mx-auto text-center">
-        <h1 className="text-[24px] font-bold tracking-tight text-balance">
+        <h1 className="text-[24px] font-bold tracking-[-0.03em] text-balance">
           This pack link doesn&rsquo;t match an attendee.
         </h1>
         <p className="text-[13px] text-ink-muted mt-2.5 leading-[1.6]">

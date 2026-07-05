@@ -149,7 +149,7 @@ function LeadCaptureSection({ formState }: { formState: BuildSkillFormState }) {
 
   return (
     <form onSubmit={handleSubmit} className="bg-bg-card border border-line rounded-[18px] p-6 grid gap-4">
-      <div className="text-[13px] font-bold tracking-tight">Email me my Skill Pack + worksheet</div>
+      <div className="text-[13px] font-bold tracking-[-0.03em]">Email me my Skill Pack + worksheet</div>
 
       {/* Honeypot — visually hidden, never shown to real attendees. */}
       <input

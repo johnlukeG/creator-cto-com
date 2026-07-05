@@ -36,7 +36,9 @@ export async function POST(request: Request) {
   const { website, ...data } = parsed.data;
 
   // Honeypot tripped — pretend success, do not insert.
-  if (website && website.trim() !== "") {
+  // Untrimmed length check: any nonempty value (including whitespace-only)
+  // trips the honeypot, since a real attendee never touches this field.
+  if (typeof website === "string" && website.length > 0) {
     return Response.json({ ok: true });
   }
 

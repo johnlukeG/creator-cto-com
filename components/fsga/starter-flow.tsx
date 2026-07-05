@@ -99,7 +99,7 @@ function StepPicker({
       <div className="text-[11px] text-ink-faint tracking-[0.04em] uppercase mb-2">
         Step {step} of {total}
       </div>
-      <h2 className="text-[20px] font-bold tracking-tight mb-4">{title}</h2>
+      <h2 className="text-[20px] font-bold tracking-[-0.03em] mb-4">{title}</h2>
       <div className="flex flex-wrap gap-2.5">{children}</div>
     </div>
   );
@@ -154,7 +154,7 @@ export function StarterFlow() {
     return (
       <div className="max-w-[680px] mx-auto">
         <div className="flex items-center justify-between gap-3 mb-5">
-          <h2 className="text-[22px] font-bold tracking-tight">Your starter Skill Pack</h2>
+          <h2 className="text-[22px] font-bold tracking-[-0.03em]">Your starter Skill Pack</h2>
           <button
             type="button"
             onClick={handleRestart}
@@ -289,7 +289,7 @@ function LeadCaptureForm({ role, pain }: { role: RoleCategory; pain: WorkflowPai
 
   return (
     <form onSubmit={handleSubmit} className="bg-bg-card border border-line rounded-[18px] p-6 grid gap-4">
-      <div className="text-[13px] font-bold tracking-tight">Want this pack emailed to you?</div>
+      <div className="text-[13px] font-bold tracking-[-0.03em]">Want this pack emailed to you?</div>
 
       {/* Honeypot — visually hidden, never shown to real attendees. */}
       <input
