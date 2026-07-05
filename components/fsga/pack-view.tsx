@@ -6,9 +6,10 @@ import { getSkillBySlug } from "@/lib/fsga/skills/library";
 import type { Skill } from "@/lib/fsga/skills/types";
 import type { PublicPack, PublicPackItem } from "@/lib/fsga/db/queries";
 import { PackHeader } from "./pack-header";
+import { PackLeadForm } from "./pack-lead-form";
 import { SkillCard } from "./skill-card";
 
-export function PackView({ pack }: { pack: PublicPack }) {
+export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: string }) {
   const resolved = pack.items
     .map((item): { item: PublicPackItem; skill: Skill } | null => {
       const skill = getSkillBySlug(item.slug);
@@ -36,6 +37,10 @@ export function PackView({ pack }: { pack: PublicPack }) {
             rank={item.rank}
           />
         ))}
+      </div>
+
+      <div className="mt-8">
+        <PackLeadForm packSlug={packSlug} />
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">

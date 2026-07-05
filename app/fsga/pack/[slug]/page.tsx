@@ -59,7 +59,7 @@ export default async function SkillPackPage({
 
   return (
     <Section pad="normal">
-      <PackView pack={pack} />
+      <PackView pack={pack} packSlug={slug} />
     </Section>
   );
 }
