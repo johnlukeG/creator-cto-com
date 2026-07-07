@@ -16,6 +16,7 @@ import type { ReactNode } from "react";
 import { Pill } from "@/components/atoms";
 import { PackSlideCard } from "@/components/fsga/deck/pack-slide-card";
 import { QrBlock } from "@/components/fsga/deck/qr-block";
+import { TASK_ICONS } from "@/components/fsga/deck/task-icons";
 import { TeardownCard } from "@/components/fsga/deck/teardown-card";
 import { getSkillBySlug } from "../skills/library";
 import { DECK_SLIDES, TEARDOWN_SKILL_SLUG, type SlideContent } from "./deck-content";
@@ -70,7 +71,7 @@ function SlideFrame({
 // encoded in deck-content.ts's copy. "optional" per the brief: slides not
 // listed here just render plain.
 const ACCENT_PHRASES: Record<string, string> = {
-  "pain-week": "redoing",
+  "pain-week": "already done",
   "smart-people": "same manual work",
   "ai-vague": "vague",
   "skill-definition": "reusable workflow",
@@ -158,6 +159,82 @@ function ListSlide({ content }: { content: SlideContent }) {
           </div>
         ))}
       </div>
+    </SlideFrame>
+  );
+}
+
+// Act-2 recognition grid: 3×2 icon tiles, one universal repeat-task each.
+// Bullets are "iconKey: label" (same prefix parse as ModelSlide); an unknown
+// or missing icon key degrades to a label-only tile — never crashes live.
+function GridSlide({ content }: { content: SlideContent }) {
+  const tiles = (content.bullets ?? []).map((bullet) => {
+    const idx = bullet.indexOf(":");
+    return idx === -1
+      ? { iconKey: "", label: bullet }
+      : { iconKey: bullet.slice(0, idx).trim(), label: bullet.slice(idx + 1).trim() };
+  });
+
+  return (
+    <SlideFrame eyebrow={content.eyebrow}>
+      <h2 className="text-[62px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance max-w-[1400px] shrink-0">
+        {content.title}
+      </h2>
+      <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-2 gap-7 mt-12">
+        {tiles.map(({ iconKey, label }) => {
+          const Icon = TASK_ICONS[iconKey];
+          return (
+            <div
+              key={label}
+              className="bg-bg-card border border-line rounded-[24px] p-10 flex flex-col justify-between"
+            >
+              {Icon && <Icon className="w-[84px] h-[84px] text-accent shrink-0" />}
+              <p className="text-[34px] font-semibold leading-[1.25] text-ink text-balance">{label}</p>
+            </div>
+          );
+        })}
+      </div>
+    </SlideFrame>
+  );
+}
+
+// Act-2 cost visual: Mon–Fri bars, accent fill = share of the day spent
+// redoing work. Proportions are a presentation choice (illustrative, avg
+// ≈0.32 ≈ "a day and a half"), hardcoded here like ACCENT_PHRASES — the
+// speaker notes hedge with "if your week is anywhere near typical."
+const WEEK_LOAD: { day: string; frac: number }[] = [
+  { day: "Mon", frac: 0.35 },
+  { day: "Tue", frac: 0.2 },
+  { day: "Wed", frac: 0.45 },
+  { day: "Thu", frac: 0.25 },
+  { day: "Fri", frac: 0.35 },
+];
+
+function WeekSlide({ content }: { content: SlideContent }) {
+  return (
+    <SlideFrame eyebrow={content.eyebrow}>
+      <h2 className="text-[62px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
+        {content.title}
+      </h2>
+      <div className="flex-1 flex flex-col justify-center gap-8 mt-10 max-w-[1560px] w-full">
+        {WEEK_LOAD.map(({ day, frac }) => (
+          <div key={day} className="flex items-center gap-8">
+            <span className="text-[30px] font-semibold text-ink-muted w-[110px] shrink-0">{day}</span>
+            <div className="flex-1 h-[54px] bg-bg-card border border-line rounded-full overflow-hidden">
+              <div
+                className="h-full bg-accent rounded-full"
+                style={{ width: `${Math.round(frac * 100)}%` }}
+              />
+            </div>
+          </div>
+        ))}
+        <div className="flex items-center gap-4 mt-2 ml-[142px]">
+          <span className="w-[36px] h-[20px] rounded-full bg-accent shrink-0" aria-hidden />
+          <span className="text-[26px] text-ink-muted">work you've already done once</span>
+        </div>
+      </div>
+      {content.body && (
+        <p className="text-[30px] text-ink-muted leading-[1.5] mt-8 max-w-[1400px] shrink-0">{content.body}</p>
+      )}
     </SlideFrame>
   );
 }
@@ -345,6 +422,10 @@ function renderSlideContent(content: SlideContent, ctx: SlideContext): ReactNode
       return <StatementSlide content={content} />;
     case "list":
       return <ListSlide content={content} />;
+    case "grid":
+      return <GridSlide content={content} />;
+    case "week":
+      return <WeekSlide content={content} />;
     case "model":
       return <ModelSlide content={content} />;
     case "framework":

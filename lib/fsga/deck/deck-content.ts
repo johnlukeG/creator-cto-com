@@ -14,6 +14,8 @@ export type SlideKind =
   | "title"
   | "statement"
   | "list"
+  | "grid"
+  | "week"
   | "model"
   | "framework"
   | "qr"
@@ -35,7 +37,7 @@ export interface SlideContent {
   notes: string; // speaker notes: what JL SAYS. 3–6 sentences, first person, include any timing/pacing cue
 }
 
-export const DECK_TITLE = "FSGA AI Skills Workshop";
+export const DECK_TITLE = "Your First AI Skill";
 
 // The Skill JL tears down live in act 4. Must exist in the library.
 export const TEARDOWN_SKILL_SLUG = "sales-call-prep";
@@ -47,8 +49,8 @@ export const DECK_SLIDES: SlideContent[] = [
     act: 1,
     kind: "title",
     eyebrow: "FSGA Conference · Live Workshop",
-    title: "FSGA AI Skills Workshop",
-    body: "JL · Creator CTO. You'll leave with one AI Skill built for your actual job.",
+    title: "Your First AI Skill",
+    body: "JL · Creator CTO. Not another tool list — you'll leave with one Skill built for your actual job.",
     notes:
       "Hey everyone, I'm JL, and I make videos about practical AI workflows as Creator CTO. Here's my promise up front: most AI talks leave you with a list of tools and a vague feeling you should be doing more. [Pause, scan the room.] This one leaves you with one Skill you can run on Monday, built around work you already do. So let me start with an uncomfortable question.",
   },
@@ -57,11 +59,11 @@ export const DECK_SLIDES: SlideContent[] = [
     act: 1,
     kind: "statement",
     eyebrow: "act one · the problem",
-    title: "The honest question",
-    big: "How much of your week is redoing work you've already done?",
-    body: "Not new work. The same recap, the same email, the same deck, rebuilt from scratch.",
+    title: "The hidden tax",
+    big: "The most expensive work you do is work you've already done.",
+    body: "The recap rebuilt every month. The research redone before every call. The deck, again, for the fifth brand.",
     notes:
-      "[Let the question hang. Do not fill the silence.] I'm not talking about the hard, creative work. I mean the sponsorship recap you rebuild every month, the prospect research you redo before every call, the newsletter you reassemble from the same show notes. Be honest with yourself: what's your number, a quarter of your week, half? Keep that number in your head, because in 30 minutes we start giving some of it back.",
+      "How much of your week is redoing work you've already done? [Let the question hang. Do not fill the silence.] I'm not talking about the hard, creative work. I mean the sponsorship recap you rebuild every month, the prospect research you redo before every call, the newsletter you reassemble from the same show notes. Be honest with yourself: what's your number, a quarter of your week, half? Keep that number in your head, because in 30 minutes we start giving some of it back.",
   },
   {
     id: "smart-people",
@@ -77,36 +79,33 @@ export const DECK_SLIDES: SlideContent[] = [
 
   // ── Act 2 — "he gets our work" ──────────────────────────────────────────
   {
-    id: "your-work-sales",
+    id: "your-work",
     act: 2,
-    kind: "list",
+    kind: "grid",
     eyebrow: "act two · your work",
-    title: "If you're in sales or partnerships",
+    title: "You do at least one of these",
+    // "iconKey: label" — icon keys resolve against TASK_ICONS in
+    // components/fsga/deck/task-icons.tsx; unknown keys render label-only.
     bullets: [
-      "Prospect research before every partnerships meeting",
-      "Sponsor fit and activation ideas, deal by deal",
-      "Rebuilding the sponsorship deck for each brand",
-      "Post-conference follow-ups, forty cards deep",
-      "The weekly pipeline summary leadership keeps asking for",
+      "followup: The follow-up pile",
+      "recap: The weekly recap",
+      "research: Research before every call",
+      "deck: The deck rebuild",
+      "formats: One thing → five formats",
+      "schedule: The scheduling dance",
     ],
     notes:
-      "I did my homework on this room, so let's make it specific. [Gesture down the list; name a real example someone told you at this event.] Prospect research before every first call, sponsor-fit scoring deal by deal, the deck rebuilt for the fifth brand this quarter. And the follow-up pile after an event exactly like this one, where warm leads go cold because you ran out of Tuesday. Raise a hand if the follow-up pile just hit a nerve. [Wait for hands.] Hold that thought.",
+      "I did my homework on this room, and every job here pays at least one of these taxes. [Walk the grid; name real examples someone told you at this event.] Sales and partnerships: that's prospect research before every first call, the deck rebuilt for the fifth brand this quarter, and the follow-up pile after an event exactly like this one, where warm leads go cold because you ran out of Tuesday. Content and media: one great podcast, then an afternoon hunting clips for TikTok, Reels, and Shorts, then the newsletter rebuilt from the same show notes. Raise a hand when you spot yours. [Wait for hands.] Keep it in mind — that one's your candidate for the rest of the hour.",
   },
   {
-    id: "your-work-content",
+    id: "week-cost",
     act: 2,
-    kind: "list",
-    eyebrow: "act two · your work",
-    title: "If you're in content or media",
-    bullets: [
-      "Turning one podcast into a week of clips",
-      "The newsletter, rebuilt from the same show notes",
-      "Weekly reporting nobody enjoys assembling",
-      "Scheduling interviews and screening for the next hire",
-      "Meeting follow-ups that slip three days late",
-    ],
+    kind: "week",
+    eyebrow: "act two · what it costs",
+    title: "What it adds up to",
+    body: "About a day and a half, every week, on work you've already done once.",
     notes:
-      "Content side, same tax. [Call out a real show or team from the room if you have one.] You record one great podcast, then burn the afternoon hunting clip moments for TikTok, Reels, and Shorts, then rebuild the newsletter from the same show notes. Stack resume screening and interview scheduling on top if you're hiring. Who here has an episode from last week that still isn't clipped? [Wait for the laugh.] None of this is your craft, it's the tax you pay to do your craft.",
+      "Here's a typical week with that work shaded in. [Let the bars do the talking; don't read them.] If your week is anywhere near typical, that's about a day and a half, every week, going to work you've already done once. Remember the number from act one? This is where it hides — not one big block, a slice off every single day. None of this is your craft; it's the tax you pay to do your craft. Who's looking at this thinking 'mine's worse'? [Wait for hands, take the laugh.] Hold that feeling, because the rest of the hour is about taking it back.",
   },
 
   // ── Act 3 — learn ───────────────────────────────────────────────────────

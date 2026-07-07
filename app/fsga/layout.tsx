@@ -4,7 +4,7 @@ import { Logo, Pill } from "@/components/atoms";
 import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "FSGA AI Skills Workshop",
+  title: "AI Skills Workshop · FSGA",
   robots: {
     index: false,
     follow: false,
