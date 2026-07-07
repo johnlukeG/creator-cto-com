@@ -6,19 +6,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:push": "drizzle-kit push",
+    "fsga:import": "tsx --env-file=.env.local scripts/fsga/import-attendees.ts",
+    "fsga:packs": "tsx --env-file=.env.local scripts/fsga/generate-packs.ts",
+    "fsga:seed": "tsx --env-file=.env.local scripts/fsga/seed-fake.ts",
+    "fsga:approve": "tsx --env-file=.env.local scripts/fsga/approve-packs.ts",
+    "fsga:leads": "tsx --env-file=.env.local scripts/fsga/export-leads.ts",
+    "fsga:check": "tsx scripts/fsga/check-skill-library.ts",
+    "fsga:warm": "tsx scripts/fsga/warm-packs.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
+    "csv-parse": "^7.0.1",
+    "drizzle-orm": "^0.45.2",
     "next": "^16.2.9",
+    "postgres": "^3.4.9",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.0",
     "typescript": "^5"
   }
 }
