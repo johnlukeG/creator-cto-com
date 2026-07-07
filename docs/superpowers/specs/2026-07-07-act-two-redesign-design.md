@@ -61,3 +61,18 @@ DB-free by construction, authored in 1920×1080 stage pixels, consistent with ev
 
 - `npx tsc --noEmit` clean.
 - Dev server: load deck route, screenshot both act-2 slides, check icon legibility + bar layout at stage scale.
+
+## Revision — 2026-07-07 (same day)
+
+The week-cost bar slide shipped and was cut the same day: "tasks repeat and
+add up" is advice the room already knows, and illustrative bars aren't real
+data. Slide 2 of act two is now `redo-thinking` (kind `statement`, no custom
+renderer): **"You don't just redo the work. You redo the thinking."** — the
+process lives only in the presenter's head, so every repeat runs through
+them. This is the insight the room hasn't named, and act 3's Skill
+definition becomes its direct payoff. The `week` kind, `WeekSlide`, and
+`WEEK_LOAD` were removed. Act 3 got a light touch from the Claude-docs
+Skills framing: skill-definition body/notes now call back to "the thinking
+from act two, written down once — loads every run, never explain twice";
+skill-model notes gained the composability beat (Skills stack —
+output of one is input of the next). Task grid slide unchanged.

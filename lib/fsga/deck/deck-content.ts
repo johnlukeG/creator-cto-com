@@ -15,7 +15,6 @@ export type SlideKind =
   | "statement"
   | "list"
   | "grid"
-  | "week"
   | "model"
   | "framework"
   | "qr"
@@ -98,14 +97,15 @@ export const DECK_SLIDES: SlideContent[] = [
       "I did my homework on this room, and every job here pays at least one of these taxes. [Walk the grid; name real examples someone told you at this event.] Sales and partnerships: that's prospect research before every first call, the deck rebuilt for the fifth brand this quarter, and the follow-up pile after an event exactly like this one, where warm leads go cold because you ran out of Tuesday. Content and media: one great podcast, then an afternoon hunting clips for TikTok, Reels, and Shorts, then the newsletter rebuilt from the same show notes. Raise a hand when you spot yours. [Wait for hands.] Keep it in mind — that one's your candidate for the rest of the hour.",
   },
   {
-    id: "week-cost",
+    id: "redo-thinking",
     act: 2,
-    kind: "week",
-    eyebrow: "act two · what it costs",
-    title: "What it adds up to",
-    body: "About a day and a half, every week, on work you've already done once.",
+    kind: "statement",
+    eyebrow: "act two · the real problem",
+    title: "The part nobody names",
+    big: "You don't just redo the work. You redo the thinking.",
+    body: "The steps live in exactly one place: your head. So every repeat has to run through you.",
     notes:
-      "Here's a typical week with that work shaded in. [Let the bars do the talking; don't read them.] If your week is anywhere near typical, that's about a day and a half, every week, going to work you've already done once. Remember the number from act one? This is where it hides — not one big block, a slice off every single day. None of this is your craft; it's the tax you pay to do your craft. Who's looking at this thinking 'mine's worse'? [Wait for hands, take the laugh.] Hold that feeling, because the rest of the hour is about taking it back.",
+      "Here's the part nobody names. Take your tile off that grid — the reason it costs so much isn't the doing, it's that the how lives in exactly one place. [Tap your temple.] Every time you rebuild that recap, you re-make the same fifty small decisions you made last month: what goes in, what order, what tone. Want proof? Hand the task to a new hire and watch yourself spend an hour explaining it — that's the tell. The process was never written down, so every repeat has to run through you. Your expertise is real; it's just trapped. Hold that, because the way out is next.",
   },
 
   // ── Act 3 — learn ───────────────────────────────────────────────────────
@@ -127,9 +127,9 @@ export const DECK_SLIDES: SlideContent[] = [
     eyebrow: "act three · the idea",
     title: "This is the whole talk",
     big: "An AI Skill is a reusable workflow. Not a one-off prompt.",
-    body: "A one-off prompt, you retype every time. A Skill you write once, then run forever.",
+    body: "The thinking from act two, written down once. It loads every run — you never explain twice.",
     notes:
-      "If you take one sentence home, take this one. [Let it land. Don't rush off it.] A one-off prompt is you at 11pm re-explaining your whole situation from scratch, again. A Skill is that instruction written down once, so next week you just drop in new inputs and run it. It's your sponsorship recap: you don't redesign the deck every month, you fill in the new numbers. A Skill is that, for anything you repeat.",
+      "If you take one sentence home, take this one. [Let it land. Don't rush off it.] A one-off prompt is you at 11pm re-explaining your whole situation from scratch, again. A Skill is that trapped thinking from act two, written down once — it loads automatically every time you run it, so you never give the same guidance twice. It's your sponsorship recap: you don't redesign the deck every month, you fill in the new numbers. A Skill is that, for anything you repeat.",
   },
   {
     id: "skill-model",
@@ -144,7 +144,7 @@ export const DECK_SLIDES: SlideContent[] = [
       "Output: the finished thing you needed",
     ],
     notes:
-      "Every Skill has the same three-part shape: input, process, output. [Point to each as you say it.] Input is what you'd hand a new hire, like the show notes or the messy transcript. Process is what you'd tell them to do with it, the steps you already run in your head. Output is the finished thing, the clip list or the call plan. If you can explain a task to someone on their first day, you can build it as a Skill; you're describing your work, not learning to code.",
+      "Every Skill has the same three-part shape: input, process, output. [Point to each as you say it.] Input is what you'd hand a new hire, like the show notes or the messy transcript. Process is what you'd tell them to do with it, the steps you already run in your head. Output is the finished thing, the clip list or the call plan. If you can explain a task to someone on their first day, you can build it as a Skill; you're describing your work, not learning to code. And here's the part almost nobody tells you: this shape is why Skills stack — the output of your recap Skill is the input of your research Skill, and three Skills chained is a pipeline that preps your whole week. That's later, though. First you need one.",
   },
   {
     id: "skill-spotting",

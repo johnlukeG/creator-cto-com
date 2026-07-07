@@ -73,6 +73,7 @@ function SlideFrame({
 const ACCENT_PHRASES: Record<string, string> = {
   "pain-week": "already done",
   "smart-people": "same manual work",
+  "redo-thinking": "redo the thinking",
   "ai-vague": "vague",
   "skill-definition": "reusable workflow",
   "one-not-ten": "one workflow",
@@ -193,48 +194,6 @@ function GridSlide({ content }: { content: SlideContent }) {
           );
         })}
       </div>
-    </SlideFrame>
-  );
-}
-
-// Act-2 cost visual: Mon–Fri bars, accent fill = share of the day spent
-// redoing work. Proportions are a presentation choice (illustrative, avg
-// ≈0.32 ≈ "a day and a half"), hardcoded here like ACCENT_PHRASES — the
-// speaker notes hedge with "if your week is anywhere near typical."
-const WEEK_LOAD: { day: string; frac: number }[] = [
-  { day: "Mon", frac: 0.35 },
-  { day: "Tue", frac: 0.2 },
-  { day: "Wed", frac: 0.45 },
-  { day: "Thu", frac: 0.25 },
-  { day: "Fri", frac: 0.35 },
-];
-
-function WeekSlide({ content }: { content: SlideContent }) {
-  return (
-    <SlideFrame eyebrow={content.eyebrow}>
-      <h2 className="text-[62px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
-        {content.title}
-      </h2>
-      <div className="flex-1 flex flex-col justify-center gap-8 mt-10 max-w-[1560px] w-full">
-        {WEEK_LOAD.map(({ day, frac }) => (
-          <div key={day} className="flex items-center gap-8">
-            <span className="text-[30px] font-semibold text-ink-muted w-[110px] shrink-0">{day}</span>
-            <div className="flex-1 h-[54px] bg-bg-card border border-line rounded-full overflow-hidden">
-              <div
-                className="h-full bg-accent rounded-full"
-                style={{ width: `${Math.round(frac * 100)}%` }}
-              />
-            </div>
-          </div>
-        ))}
-        <div className="flex items-center gap-4 mt-2 ml-[142px]">
-          <span className="w-[36px] h-[20px] rounded-full bg-accent shrink-0" aria-hidden />
-          <span className="text-[26px] text-ink-muted">work you've already done once</span>
-        </div>
-      </div>
-      {content.body && (
-        <p className="text-[30px] text-ink-muted leading-[1.5] mt-8 max-w-[1400px] shrink-0">{content.body}</p>
-      )}
     </SlideFrame>
   );
 }
@@ -424,8 +383,6 @@ function renderSlideContent(content: SlideContent, ctx: SlideContext): ReactNode
       return <ListSlide content={content} />;
     case "grid":
       return <GridSlide content={content} />;
-    case "week":
-      return <WeekSlide content={content} />;
     case "model":
       return <ModelSlide content={content} />;
     case "framework":
