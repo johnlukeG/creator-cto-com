@@ -32,6 +32,59 @@ function FollowupIcon(props: IconProps) {
   );
 }
 
+/** Phone handset — sponsor / partnership call prep. */
+function CallIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
+
+/** Person — background on a prospective hire. */
+function HireIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M5 21a7 7 0 0 1 14 0" />
+    </svg>
+  );
+}
+
+/** Checked list — meeting into next steps and follow-ups. */
+function MeetingIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="m3 5.5 1.5 1.5L7 4.5" />
+      <path d="M11 6h10" />
+      <path d="m3 11.5 1.5 1.5L7 10.5" />
+      <path d="M11 12h10" />
+      <path d="m3 17.5 1.5 1.5L7 16.5" />
+      <path d="M11 18h10" />
+    </svg>
+  );
+}
+
+/** Shield check — reviewing a partner, vendor, or target. */
+function ReviewIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z" />
+      <path d="m9 11.5 2 2 4-4" />
+    </svg>
+  );
+}
+
+/** Trend line — industry movement for leadership. */
+function IndustryIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="m22 7-8.5 8.5-5-5L2 17" />
+      <path d="M16 7h6v6" />
+    </svg>
+  );
+}
+
 /** Refresh loop — the weekly recap, rebuilt on a cycle. */
 function RecapIcon(props: IconProps) {
   return (
@@ -92,6 +145,11 @@ function ScheduleIcon(props: IconProps) {
 
 export const TASK_ICONS: Record<string, ComponentType<IconProps>> = {
   followup: FollowupIcon,
+  call: CallIcon,
+  hire: HireIcon,
+  meeting: MeetingIcon,
+  review: ReviewIcon,
+  industry: IndustryIcon,
   recap: RecapIcon,
   research: ResearchIcon,
   deck: DeckIcon,

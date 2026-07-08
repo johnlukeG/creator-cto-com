@@ -3,7 +3,7 @@
 // the projected stage itself (scales with it) — unlike NotesPanel, which is
 // deliberately kept off the scaled stage for presenter-side readability.
 
-export function Progress({ index, total, act }: { index: number; total: number; act: 1 | 2 | 3 | 4 | 5 | 6 }) {
+export function Progress({ index, total, act }: { index: number; total: number; act: 1 | 2 | 3 | 4 }) {
   const pct = total > 0 ? ((index + 1) / total) * 100 : 0;
 
   return (

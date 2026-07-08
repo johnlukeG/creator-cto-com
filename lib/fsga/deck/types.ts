@@ -23,7 +23,7 @@ export interface SlideContext {
 
 export interface SlideDef {
   id: string;
-  act: 1 | 2 | 3 | 4 | 5 | 6;
+  act: 1 | 2 | 3 | 4;
   title: string;
   notes: string;
   render: (ctx: SlideContext) => ReactNode;
