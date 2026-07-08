@@ -218,17 +218,10 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "scorecard",
     eyebrow: "act four · first rep",
     title: "Should this become a Skill?",
-    body: "High on frequency, context reload, and reusable judgment? Good Skill candidate.",
-    bullets: [
-      "Frequency: How often does this task come back?",
-      "Context reload: How much do you have to remember or re-explain?",
-      "Clear input: Can you name the raw material that starts it?",
-      "Clear output: Would you recognize a useful finished version?",
-      "Reusable judgment: Are there standards, examples, or rules you apply each time?",
-      "Low-risk first draft: Is a better first draft useful even with human review?",
-    ],
+    // Dimensions, hint copy, and verdict logic live in lib/fsga/scorecard.ts —
+    // shared with the interactive scorecard on the attendee pack page.
     notes:
-      "Now do this for real: pick one repeated task from your work and score it, one to five, on each of these six. Don't overthink it. [Give them a real minute; don't rescue the silence.] If it scores high on frequency, context reload, and reusable judgment, it's probably a good Skill candidate. The best first Skill is usually not the flashiest one — it's the task where you keep reloading the same context and standards.",
+      "Now do this for real: pick one repeated task from your work and score it, one to five, on each of these six. This same scorecard is on your pack page, under your Skills — score yours on your phone right now while I score one up here. [Take the football volunteer's task and click it through live; let the verdict land on screen. Give the room a real minute; don't rescue the silence.] If it comes back 'build this Skill,' that's your first rep. The best first Skill is usually not the flashiest one — it's the task where you keep reloading the same context and standards.",
   },
   {
     id: "name-the-skill",

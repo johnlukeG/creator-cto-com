@@ -24,6 +24,7 @@ import {
 } from "@/components/fsga/deck/diagram-glyphs";
 import { QrBlock } from "@/components/fsga/deck/qr-block";
 import { TASK_ICONS } from "@/components/fsga/deck/task-icons";
+import { ScorecardInteractive } from "@/components/fsga/scorecard-interactive";
 import { getSkillBySlug } from "../skills/library";
 import { DECK_SLIDES, TEARDOWN_SKILL_SLUG, type SlideContent } from "./deck-content";
 import type { SlideDef } from "./types";
@@ -625,35 +626,20 @@ function FrameworkSlide({ content }: { content: SlideContent }) {
   );
 }
 
-// Six-dimension 1–5 scorecard. Bullets are "Dimension: question".
+// Six-dimension 1–5 scorecard — live-interactive. JL clicks scores on stage
+// (e.g. a volunteer's task) and the verdict updates in real time. Dimensions
+// and verdict logic live in lib/fsga/scorecard.ts, shared with the attendee
+// pack page. State survives slide navigation because DeckShell keeps every
+// slide mounted.
 function ScorecardSlide({ content }: { content: SlideContent }) {
-  const rows = (content.bullets ?? []).map(splitBullet);
   return (
     <SlideFrame eyebrow={content.eyebrow}>
       <h2 className="text-[58px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
         {content.title}
       </h2>
-      <div className="flex-1 min-h-0 flex flex-col justify-center gap-6 mt-8">
-        {rows.map(({ key, text }) => (
-          <div key={key} className="grid grid-cols-[400px_1fr_auto] items-center gap-8">
-            <span className="text-[29px] font-bold text-ink">{key}</span>
-            <span className="text-[25px] text-ink-muted leading-[1.3]">{text}</span>
-            <div className="flex gap-3" aria-hidden>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <span
-                  key={n}
-                  className="w-[36px] h-[36px] rounded-full border-2 border-line flex items-center justify-center text-[16px] text-ink-muted"
-                >
-                  {n}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="flex-1 min-h-0 flex flex-col justify-center mt-8">
+        <ScorecardInteractive variant="stage" />
       </div>
-      {content.body && (
-        <p className="text-[30px] font-semibold text-ink leading-[1.4] mt-8 shrink-0">{content.body}</p>
-      )}
     </SlideFrame>
   );
 }
