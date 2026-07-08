@@ -221,7 +221,7 @@ export const DECK_SLIDES: SlideContent[] = [
     // Dimensions, hint copy, and verdict logic live in lib/fsga/scorecard.ts —
     // shared with the interactive scorecard on the attendee pack page.
     notes:
-      "Now do this for real: pick one repeated task from your work and score it, one to five, on each of these six. This same scorecard is on your pack page, under your Skills — score yours on your phone right now while I score one up here. [Take the football volunteer's task and click it through live; let the verdict land on screen. Give the room a real minute; don't rescue the silence.] If it comes back 'build this Skill,' that's your first rep. The best first Skill is usually not the flashiest one — it's the task where you keep reloading the same context and standards.",
+      "Now do this for real: pick one repeated task from your work and answer these six questions — plain answers, no scale to overthink. This same scorecard is on your pack page, under your Skills — do yours on your phone right now while I run one up here. [Take the football volunteer's task and click it through live; let the meter climb and the verdict land. Give the room a real minute; don't rescue the silence.] If the bell rings, that's your first rep. The best first Skill is usually not the flashiest one — it's the task where you keep reloading the same context and standards.",
   },
   {
     id: "name-the-skill",

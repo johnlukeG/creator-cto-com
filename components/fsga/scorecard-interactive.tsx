@@ -17,7 +17,6 @@ import { BellGlyph } from "@/components/fsga/deck/diagram-glyphs";
 import {
   SCORECARD_DIMENSIONS,
   SCORECARD_HINT,
-  SCORE_MAX_PER_DIMENSION,
   SCORE_TIERS,
   SCORE_TOTAL_MAX,
   scoreTotal,
@@ -25,32 +24,31 @@ import {
   type ScoreVerdict,
 } from "@/lib/fsga/scorecard";
 
-const SCORE_VALUES = Array.from({ length: SCORE_MAX_PER_DIMENSION }, (_, i) => i + 1);
-
 // Stage sizes are 1920×1080 stage pixels (the deck scales the whole box);
 // page sizes are real CSS pixels on the attendee's phone.
 const STYLES = {
   stage: {
     layout: "flex items-stretch gap-16",
-    rows: "flex-1 flex flex-col justify-center gap-6",
-    row: "grid grid-cols-[360px_1fr_auto] items-center gap-8",
-    label: "text-[29px] font-bold text-ink",
-    question: "text-[24px] text-ink-muted leading-[1.3]",
-    circles: "flex gap-3",
-    circle: "w-[44px] h-[44px] border-2 text-[18px]",
-    verdict: "mt-8 rounded-[20px] border p-6 flex items-center gap-7 min-h-[130px]",
-    verdictLabel: "text-[32px] font-bold tracking-[-0.02em]",
-    verdictDetail: "text-[23px] text-ink-muted leading-[1.35] mt-1",
-    hint: "text-[24px] text-ink-muted leading-[1.4]",
-    reset: "text-[20px]",
-    meter: "w-[300px]",
-    meterTitle: "text-[20px] font-bold tracking-[0.16em]",
-    bell: "w-[44px] h-[44px]",
-    ding: "text-[24px]",
-    track: "w-[110px] rounded-[26px]",
-    tickLabel: "text-[17px]",
-    readout: "text-[46px]",
-    readoutSub: "text-[19px]",
+    rows: "flex-1 flex flex-col justify-center gap-4",
+    row: "grid grid-cols-[430px_1fr] items-center gap-x-10",
+    label: "text-[26px] font-bold text-ink",
+    question: "text-[18px] text-ink-muted leading-[1.25] mt-0.5",
+    circles: "flex flex-wrap gap-3",
+    circle: "px-5 py-2 border-2 text-[19px] rounded-full",
+    verdict: "mt-6 rounded-[20px] border p-5 flex items-center gap-7 min-h-[110px]",
+    verdictLabel: "text-[28px] font-bold tracking-[-0.02em]",
+    verdictDetail: "text-[21px] text-ink-muted leading-[1.35] mt-1",
+    hint: "text-[22px] text-ink-muted leading-[1.4]",
+    reset: "text-[19px]",
+    meter: "w-[290px]",
+    meterTitle: "text-[19px] font-bold tracking-[0.16em]",
+    bell: "w-[40px] h-[40px]",
+    ding: "text-[22px]",
+    track: "rounded-[24px]",
+    trackCol: "w-[96px]",
+    tickLabel: "text-[16px]",
+    readout: "text-[42px]",
+    readoutSub: "text-[18px]",
   },
   page: {
     layout: "flex flex-col gap-5",
@@ -58,8 +56,8 @@ const STYLES = {
     row: "flex flex-col gap-2",
     label: "text-[14px] font-bold text-ink",
     question: "text-[12px] text-ink-muted leading-[1.5]",
-    circles: "flex gap-2 mt-1",
-    circle: "w-[38px] h-[38px] border text-[13px]",
+    circles: "flex flex-wrap gap-2 mt-1.5",
+    circle: "px-3.5 py-2 border text-[12px] rounded-full",
     verdict: "rounded-[14px] border p-4 flex-1 flex flex-wrap items-center gap-x-5 gap-y-3",
     verdictLabel: "text-[16px] font-bold tracking-[-0.01px]",
     verdictDetail: "text-[12px] text-ink-muted leading-[1.5] mt-0.5",
@@ -69,7 +67,8 @@ const STYLES = {
     meterTitle: "text-[10px] font-bold tracking-[0.14em]",
     bell: "w-[20px] h-[20px]",
     ding: "text-[12px]",
-    track: "w-[52px] rounded-[14px]",
+    track: "rounded-[14px]",
+    trackCol: "w-[52px]",
     tickLabel: "text-[9px]",
     readout: "text-[22px]",
     readoutSub: "text-[10px]",
@@ -102,18 +101,22 @@ function ScoreMeter({
   const fillPct = Math.min(fillTotal / SCORE_TOTAL_MAX, 1) * 100;
 
   return (
-    <div className={`${s.meter} flex flex-col items-center gap-3`} aria-hidden>
-      <div className={`${s.meterTitle} uppercase text-ink-muted`}>Skill‑o‑meter</div>
-      <div
-        className={`flex items-center gap-2 transition-opacity duration-300 ${
-          rang ? "opacity-100 animate-bounce" : "opacity-35"
-        }`}
-      >
-        <BellGlyph className={`${s.bell} ${rang ? "text-accent" : "text-ink-muted"}`} />
-        {rang && <span className={`${s.ding} font-bold text-accent tracking-[0.1em]`}>DING!</span>}
+    <div className={`${s.meter} flex flex-col gap-2`} aria-hidden>
+      <div className={`${s.meterTitle} uppercase text-ink-muted self-center`}>Skill‑o‑meter</div>
+      {/* Bell, track, and readout all center on the track column; the tier
+          labels live in a right-hand gutter aligned to the track's height. */}
+      <div className={`${s.trackCol} flex justify-center`}>
+        <div
+          className={`flex items-center gap-2 transition-opacity duration-300 ${
+            rang ? "opacity-100 animate-bounce" : "opacity-35"
+          }`}
+        >
+          <BellGlyph className={`${s.bell} ${rang ? "text-accent" : "text-ink-muted"}`} />
+          {rang && <span className={`${s.ding} font-bold text-accent tracking-[0.1em]`}>DING!</span>}
+        </div>
       </div>
-      <div className="flex-1 min-h-0 self-stretch flex justify-center">
-        <div className={`${s.track} relative h-full bg-bg-card border border-line overflow-hidden`}>
+      <div className="flex-1 min-h-0 self-stretch flex">
+        <div className={`${s.trackCol} ${s.track} shrink-0 relative h-full bg-bg-card border border-line overflow-hidden`}>
           <div
             className="absolute inset-x-0 bottom-0 bg-accent transition-[height] duration-700 ease-out"
             style={{ height: `${fillPct}%` }}
@@ -121,7 +124,7 @@ function ScoreMeter({
           {/* puck riding the top of the fill */}
           {total > 0 && (
             <div
-              className="absolute inset-x-[6px] h-[8px] rounded-full bg-bg mix-blend-normal opacity-90 transition-[bottom] duration-700 ease-out"
+              className="absolute inset-x-[6px] h-[8px] rounded-full bg-bg opacity-90 transition-[bottom] duration-700 ease-out"
               style={{ bottom: `calc(${fillPct}% - 4px)` }}
             />
           )}
@@ -133,7 +136,7 @@ function ScoreMeter({
             />
           ))}
         </div>
-        <div className="relative w-0">
+        <div className="relative flex-1 min-w-0">
           {METER_TICKS.map((tick) => (
             <span
               key={tick.label}
@@ -145,9 +148,11 @@ function ScoreMeter({
           ))}
         </div>
       </div>
-      <div className={`${s.readout} font-bold tracking-[-0.02em] ${rang ? "text-accent" : "text-ink"}`}>
-        {total}
-        <span className={`${s.readoutSub} text-ink-muted font-normal`}> /{SCORE_TOTAL_MAX}</span>
+      <div className={`${s.trackCol} flex justify-center`}>
+        <div className={`${s.readout} font-bold tracking-[-0.02em] ${rang ? "text-accent" : "text-ink"}`}>
+          {total}
+          <span className={`${s.readoutSub} text-ink-muted font-normal`}> /{SCORE_TOTAL_MAX}</span>
+        </div>
       </div>
     </div>
   );
@@ -205,40 +210,32 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
     <div className={s.rows}>
       {SCORECARD_DIMENSIONS.map((dim) => (
         <div key={dim.key} className={s.row}>
-          {variant === "stage" ? (
-            <>
-              <span className={s.label}>{dim.label}</span>
-              <span className={s.question}>{dim.question}</span>
-            </>
-          ) : (
-            <div>
-              <div className={s.label}>{dim.label}</div>
-              <div className={s.question}>{dim.question}</div>
-            </div>
-          )}
-          <div className={s.circles} role="radiogroup" aria-label={dim.label}>
-            {SCORE_VALUES.map((value) => {
-              const selected = scores[dim.key] === value;
+          <div>
+            <div className={s.label}>{dim.label}</div>
+            <div className={s.question}>{dim.question}</div>
+          </div>
+          <div className={s.circles} role="radiogroup" aria-label={dim.question}>
+            {dim.options.map((option) => {
+              const selected = scores[dim.key] === option.value;
               return (
                 <button
-                  key={value}
+                  key={option.label}
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={`${dim.label}: ${value} of ${SCORE_MAX_PER_DIMENSION}`}
-                  className={`${s.circle} rounded-full flex items-center justify-center font-bold transition-colors cursor-pointer ${
+                  className={`${s.circle} font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                     selected
                       ? "bg-accent border-accent text-accent-ink"
                       : "border-line text-ink-muted hover:border-accent/60 hover:text-ink"
                   }`}
                   onClick={(event) => {
-                    setScores((prev) => ({ ...prev, [dim.key]: value }));
+                    setScores((prev) => ({ ...prev, [dim.key]: option.value }));
                     // Drop focus so the deck's Space/arrow keys keep
                     // navigating slides instead of re-firing this button.
                     event.currentTarget.blur();
                   }}
                 >
-                  {value}
+                  {option.label}
                 </button>
               );
             })}

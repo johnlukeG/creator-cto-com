@@ -3,6 +3,12 @@
 // the attendee pack page). Data + pure functions only — no React, no DB —
 // so the deck stays DB-free and both surfaces can't drift apart.
 
+export interface ScorecardOption {
+  label: string;
+  /** Score contributed toward the total (1–5 scale under the hood). */
+  value: number;
+}
+
 export interface ScorecardDimension {
   key: string;
   label: string;
@@ -10,34 +16,77 @@ export interface ScorecardDimension {
   /** The three dimensions the verdict weights hardest (per the outline:
    * "high on frequency, context reload, and reusable judgment"). */
   core: boolean;
+  /** Concrete plain-language answers, strongest first. Values quantize to
+   * 5/3/1 so the 1–5 engine, tiers, and meter stay unchanged. */
+  options: ScorecardOption[];
 }
 
 export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
-  { key: "frequency", label: "Frequency", question: "How often does this task come back?", core: true },
+  {
+    key: "frequency",
+    label: "Frequency",
+    question: "How often does this task come back?",
+    core: true,
+    options: [
+      { label: "Weekly or more", value: 5 },
+      { label: "Monthly-ish", value: 3 },
+      { label: "A few times a year", value: 1 },
+    ],
+  },
   {
     key: "context-reload",
     label: "Context reload",
-    question: "How much do you have to remember or re-explain?",
+    question: "How much re-explaining before the real work starts?",
     core: true,
+    options: [
+      { label: "A whole briefing", value: 5 },
+      { label: "A few reminders", value: 3 },
+      { label: "Almost none", value: 1 },
+    ],
   },
-  { key: "clear-input", label: "Clear input", question: "Can you name the raw material that starts it?", core: false },
+  {
+    key: "clear-input",
+    label: "Clear input",
+    question: "Can you name the raw material that starts it?",
+    core: false,
+    options: [
+      { label: "Yes — notes, files, a list", value: 5 },
+      { label: "Sort of", value: 3 },
+      { label: "It's fuzzy", value: 1 },
+    ],
+  },
   {
     key: "clear-output",
     label: "Clear output",
     question: "Would you recognize a useful finished version?",
     core: false,
+    options: [
+      { label: "Instantly", value: 5 },
+      { label: "Roughly", value: 3 },
+      { label: "Hard to say", value: 1 },
+    ],
   },
   {
     key: "reusable-judgment",
     label: "Reusable judgment",
-    question: "Are there standards, examples, or rules you apply each time?",
+    question: "Do you apply the same standards or rules each time?",
     core: true,
+    options: [
+      { label: "Same rules every time", value: 5 },
+      { label: "Some patterns", value: 3 },
+      { label: "Every time is different", value: 1 },
+    ],
   },
   {
     key: "low-risk",
     label: "Low-risk first draft",
     question: "Is a better first draft useful even with human review?",
     core: false,
+    options: [
+      { label: "Very useful", value: 5 },
+      { label: "Somewhat", value: 3 },
+      { label: "Too risky", value: 1 },
+    ],
   },
 ];
 

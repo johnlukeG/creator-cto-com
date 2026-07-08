@@ -50,8 +50,8 @@ export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: strin
         </div>
         <h2 className="text-[18px] font-bold tracking-[-0.02em] mt-2">Should it become a Skill?</h2>
         <p className="text-[13px] text-ink-muted leading-[1.6] mt-1.5 mb-5">
-          Pick one repeated task from your week — yours, not ours — and score it, one to five, on each
-          dimension. The verdict updates as you go.
+          Pick one repeated task from your week — yours, not ours — and answer six quick questions.
+          The meter climbs as you go.
         </p>
         <ScorecardInteractive variant="page" />
       </div>
