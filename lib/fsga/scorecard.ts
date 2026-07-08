@@ -106,7 +106,7 @@ export const SCORE_MAX_PER_DIMENSION = 5;
 export const SCORE_TOTAL_MAX = SCORECARD_DIMENSIONS.length * SCORE_MAX_PER_DIMENSION;
 
 /** Shown before all six dimensions are scored. */
-export const SCORECARD_HINT = "High on frequency, context reload, and reusable judgment? Good Skill candidate.";
+export const SCORECARD_HINT = "Answer all six for the verdict.";
 
 export interface ScoreTier {
   /** 0 = strongest. Drives emphasis styling on both surfaces. */
@@ -184,13 +184,13 @@ export interface ScoreCoaching {
 }
 
 /**
- * The two weakest-scored dimensions (anything below a top answer), worst
- * first — the "what to do about it" companion to the verdict. Empty when
- * every dimension got the top answer.
+ * The single weakest-scored dimension (if any scored below a top answer) —
+ * the one "what to do about it" line that accompanies the verdict. Empty
+ * when every dimension got the top answer.
  */
 export function scoreCoaching(scores: Record<string, number>): ScoreCoaching[] {
   return SCORECARD_DIMENSIONS.filter((dim) => (scores[dim.key] ?? 0) < SCORE_MAX_PER_DIMENSION)
     .sort((a, b) => (scores[a.key] ?? 0) - (scores[b.key] ?? 0))
-    .slice(0, 2)
+    .slice(0, 1)
     .map((dim) => ({ label: dim.label, advice: dim.advice }));
 }

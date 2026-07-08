@@ -278,10 +278,7 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
           </button>
         </>
       ) : (
-        <p className={s.hint}>
-          {SCORECARD_HINT}
-          {scoredCount > 0 && ` · ${scoredCount} of ${SCORECARD_DIMENSIONS.length} scored`}
-        </p>
+        <p className={s.hint}>{SCORECARD_HINT}</p>
       )}
     </div>
   );
