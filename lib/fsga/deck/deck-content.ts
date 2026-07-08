@@ -181,7 +181,7 @@ export const DECK_SLIDES: SlideContent[] = [
     title: "One Skill, all the way through",
     body: "The Newsletter Draft Assistant — the Input, Process, Output shape, filled in for real.",
     notes:
-      "Let's open one all the way up: the Newsletter Draft Assistant. [Walk the card top to bottom.] The repeated work: turning scattered links, notes, and takes into a clear email for your audience. The Input: your raw ingredients, your format, your voice. The Process: find the angle, match the voice, structure the draft, flag what still needs human judgment. The Output: a sendable draft with subject lines and review notes. This is not handing your voice to AI — the Skill gives the AI your standards before it starts writing, and you still make the final call. It just gets you a much stronger first draft.",
+      "Let's open one all the way up: the Newsletter Draft Assistant. [Walk the pipeline left to right.] The repeated work: turning scattered links, notes, and takes into a clear email for your audience. The Input: your raw ingredients, your format, your voice. The Process: find the angle, match the voice, structure the draft, flag what still needs human judgment. The Output: a sendable draft with subject lines and review notes. This is not handing your voice to AI — the Skill gives the AI your standards before it starts writing, and you still make the final call. It just gets you a much stronger first draft.",
   },
 
   // ── Act 4 — make it theirs ───────────────────────────────────────────────

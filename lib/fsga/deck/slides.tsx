@@ -7,16 +7,23 @@
 // DeckShell scales the whole box to fit whatever screen it's projected on,
 // so pixel sizes below are absolute *stage* coordinates, not real screen px.
 //
-// Hook-free since the teardown slide went slide-native (TeardownCard is
-// authored in stage pixels, no fit-scaling) — the 'use client' directive is
-// kept because this module is only ever reached through deck-shell.tsx's
-// client boundary anyway, and render functions here are client-side JSX.
+// Hook-free: every slide is authored directly in stage pixels, no
+// fit-scaling. The 'use client' directive is kept because this module is
+// only ever reached through deck-shell.tsx's client boundary anyway, and
+// render functions here are client-side JSX.
 
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 import { Pill } from "@/components/atoms";
+import {
+  ChatGlyph,
+  CheckDocGlyph,
+  DocGlyph,
+  FolderGlyph,
+  GearGlyph,
+  InboxGlyph,
+} from "@/components/fsga/deck/diagram-glyphs";
 import { QrBlock } from "@/components/fsga/deck/qr-block";
 import { TASK_ICONS } from "@/components/fsga/deck/task-icons";
-import { TeardownCard } from "@/components/fsga/deck/teardown-card";
 import { getSkillBySlug } from "../skills/library";
 import { DECK_SLIDES, TEARDOWN_SKILL_SLUG, type SlideContent } from "./deck-content";
 import type { SlideDef } from "./types";
@@ -328,13 +335,60 @@ function FolderSlide({ content }: { content: SlideContent }) {
   );
 }
 
+// Flow strip atop the Prompt column: the same prompt→result trip, re-made
+// every time — rows fade to suggest the endless repeat.
+function PromptFlowStrip() {
+  return (
+    <div className="flex flex-col gap-3" aria-hidden>
+      {[1, 0.55, 0.3].map((opacity) => (
+        <div key={opacity} className="flex items-center gap-5 text-ink-muted" style={{ opacity }}>
+          <ChatGlyph className="w-[38px] h-[38px]" />
+          <span className="text-[26px] font-bold">→</span>
+          <DocGlyph className="w-[38px] h-[38px]" />
+        </div>
+      ))}
+      <span className="text-[20px] text-ink-muted mt-1">re-written every time</span>
+    </div>
+  );
+}
+
+// Flow strip atop the Skill column: one folder, fanned out to many runs.
+function SkillFlowStrip() {
+  return (
+    <div className="flex items-center gap-6" aria-hidden>
+      <FolderGlyph className="w-[54px] h-[54px] text-accent" />
+      <div className="flex flex-col gap-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex items-center gap-4 text-ink">
+            <span className="text-[24px] font-bold text-accent">→</span>
+            <CheckDocGlyph className="w-[34px] h-[34px]" />
+          </div>
+        ))}
+      </div>
+      <span className="text-[20px] text-ink-muted self-end pb-1">created once, reused every run</span>
+    </div>
+  );
+}
+
 // Two-column contrast. Bullets are "Prompt: …" / "Skill: …"; body is the
 // bottom line under both columns.
 function CompareSlide({ content }: { content: SlideContent }) {
   const items = (content.bullets ?? []).map(splitBullet);
   const columns = [
-    { name: "Prompt", marker: "–", headerClass: "text-ink-muted", markerClass: "text-ink-muted" },
-    { name: "Skill", marker: "✓", headerClass: "text-accent", markerClass: "text-accent" },
+    {
+      name: "Prompt",
+      marker: "–",
+      headerClass: "text-ink-muted",
+      markerClass: "text-ink-muted",
+      strip: <PromptFlowStrip />,
+    },
+    {
+      name: "Skill",
+      marker: "✓",
+      headerClass: "text-accent",
+      markerClass: "text-accent",
+      strip: <SkillFlowStrip />,
+    },
   ];
 
   return (
@@ -344,17 +398,18 @@ function CompareSlide({ content }: { content: SlideContent }) {
       </h2>
       <div className="flex-1 min-h-0 grid grid-cols-2 gap-8 mt-10">
         {columns.map((col) => (
-          <div key={col.name} className="bg-bg-card border border-line rounded-[24px] p-12 flex flex-col gap-8">
+          <div key={col.name} className="bg-bg-card border border-line rounded-[24px] p-12 flex flex-col gap-7">
             <div className={`text-[40px] font-bold tracking-[-0.02em] ${col.headerClass}`}>{col.name}</div>
-            <div className="flex flex-col gap-6">
+            {col.strip}
+            <div className="flex flex-col gap-5 pt-2 border-t border-line">
               {items
                 .filter((item) => item.key === col.name)
                 .map((item) => (
                   <div key={item.text} className="flex items-start gap-5">
-                    <span className={`text-[28px] font-bold shrink-0 ${col.markerClass}`} aria-hidden>
+                    <span className={`text-[26px] font-bold shrink-0 ${col.markerClass}`} aria-hidden>
                       {col.marker}
                     </span>
-                    <span className="text-[28px] leading-[1.35] text-ink">{item.text}</span>
+                    <span className="text-[26px] leading-[1.35] text-ink">{item.text}</span>
                   </div>
                 ))}
             </div>
@@ -376,6 +431,9 @@ const FOOTBALL_ROW = [
   { label: "Result", description: "Different every time" },
 ];
 
+// Glyphs for the Skill row's Input → Process → Output cells, by position.
+const SKILL_CELL_GLYPHS: ComponentType<SVGProps<SVGSVGElement>>[] = [InboxGlyph, GearGlyph, CheckDocGlyph];
+
 function PlaybookRow({
   name,
   nameClass,
@@ -383,7 +441,7 @@ function PlaybookRow({
 }: {
   name: string;
   nameClass: string;
-  cells: { label: string; description: string }[];
+  cells: { label: string; description: string; glyph?: ComponentType<SVGProps<SVGSVGElement>> }[];
 }) {
   return (
     <div className="flex items-center gap-8">
@@ -393,11 +451,14 @@ function PlaybookRow({
       <div className="flex-1 flex items-center gap-6">
         {cells.map((cell, i) => (
           <div key={cell.label} className="contents">
-            <div className="flex-1 bg-bg-card border border-line rounded-[20px] px-8 py-7">
-              <div className="text-[30px] font-bold text-ink">{cell.label}</div>
-              {cell.description && (
-                <div className="text-[23px] text-ink-muted leading-[1.3] mt-2">{cell.description}</div>
-              )}
+            <div className="flex-1 bg-bg-card border border-line rounded-[20px] px-8 py-7 flex items-start gap-5">
+              {cell.glyph && <cell.glyph className="w-[44px] h-[44px] text-accent shrink-0 mt-1" />}
+              <div>
+                <div className="text-[30px] font-bold text-ink">{cell.label}</div>
+                {cell.description && (
+                  <div className="text-[23px] text-ink-muted leading-[1.3] mt-2">{cell.description}</div>
+                )}
+              </div>
             </div>
             {i < cells.length - 1 && (
               <div className="text-[44px] text-accent font-bold shrink-0" aria-hidden>
@@ -412,9 +473,10 @@ function PlaybookRow({
 }
 
 function PlaybookSlide({ content }: { content: SlideContent }) {
-  const skillCells = (content.bullets ?? []).map(splitBullet).map(({ key, text }) => ({
+  const skillCells = (content.bullets ?? []).map(splitBullet).map(({ key, text }, i) => ({
     label: key,
     description: text,
+    glyph: SKILL_CELL_GLYPHS[i],
   }));
 
   return (
@@ -433,10 +495,11 @@ function PlaybookSlide({ content }: { content: SlideContent }) {
   );
 }
 
-// Slide-native teardown: renders the Skill object as projection-scale chrome
-// (TeardownCard) instead of embedding the web-scale SkillCard — the embedded
-// card's 10-19px type projected at ~8-16px after fit-scaling, unreadable
-// from a ballroom.
+// Slide-native teardown: the Skill object rendered as an Input → Skill →
+// Output pipeline diagram (raw-material chips flow through the know-how
+// folder into finished outputs), authored in stage pixels so it reads from
+// a ballroom. Pulls inputs/processSteps/outputs straight off the library
+// entry — no copy duplicated here.
 function TeardownSlide({ content }: { content: SlideContent }) {
   const skill = getSkillBySlug(TEARDOWN_SKILL_SLUG);
 
@@ -447,8 +510,57 @@ function TeardownSlide({ content }: { content: SlideContent }) {
       </h2>
       {content.body && <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>}
       {skill ? (
-        <div className="flex-1 min-h-0 mt-6">
-          <TeardownCard skill={skill} />
+        <div className="flex-1 min-h-0 flex items-center gap-7 mt-6">
+          <div className="w-[430px] shrink-0 flex flex-col gap-4">
+            <span className="text-[22px] font-bold tracking-[0.1em] uppercase text-ink-muted">Input</span>
+            {skill.inputs.map((input) => (
+              <div
+                key={input}
+                className="flex items-center gap-4 bg-bg-card border border-line rounded-[16px] p-5"
+              >
+                <DocGlyph className="w-[34px] h-[34px] text-ink-muted shrink-0" />
+                <span className="text-[22px] leading-[1.3] text-ink">{input}</span>
+              </div>
+            ))}
+          </div>
+          <span className="text-[52px] text-accent font-bold shrink-0" aria-hidden>
+            →
+          </span>
+          <div className="flex-1 min-w-0 self-stretch flex flex-col justify-center">
+            <div className="relative z-10 -mb-px w-fit h-[48px] px-8 bg-bg-card border border-line border-b-0 rounded-t-[14px] flex items-center gap-3">
+              <GearGlyph className="w-[26px] h-[26px] text-accent" />
+              <span className="text-[20px] font-bold tracking-[0.14em] text-accent">SKILL</span>
+            </div>
+            <div className="bg-bg-card border border-line rounded-[20px] rounded-tl-none p-8">
+              <div className="text-[30px] font-bold text-ink">{skill.name}</div>
+              <div className="flex flex-col gap-3.5 mt-6">
+                {skill.processSteps.map((step, i) => (
+                  <div key={step} className="flex items-start gap-4">
+                    <span className="text-[22px] font-bold text-accent shrink-0">{i + 1}.</span>
+                    <span className="text-[22px] leading-[1.3] text-ink">{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <span className="text-[52px] text-accent font-bold shrink-0" aria-hidden>
+            →
+          </span>
+          <div className="w-[430px] shrink-0 flex flex-col gap-4">
+            <span className="text-[22px] font-bold tracking-[0.1em] uppercase text-accent">Output</span>
+            {skill.outputs.map((output) => (
+              <div
+                key={output}
+                className="flex items-center gap-4 bg-bg-card border border-accent/40 rounded-[16px] p-5"
+              >
+                <CheckDocGlyph className="w-[34px] h-[34px] text-accent shrink-0" />
+                <span className="text-[22px] leading-[1.3] text-ink">{output}</span>
+              </div>
+            ))}
+            <span className="text-[20px] text-ink-muted leading-[1.35] mt-1">
+              You review it. You make the final call.
+            </span>
+          </div>
         </div>
       ) : (
         // Defensive only: deck-content.ts already fails fast at import if
