@@ -637,7 +637,7 @@ function ScorecardSlide({ content }: { content: SlideContent }) {
       <h2 className="text-[58px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
         {content.title}
       </h2>
-      <div className="flex-1 min-h-0 flex flex-col justify-center mt-8">
+      <div className="flex-1 min-h-0 flex flex-col justify-center mt-5">
         <ScorecardInteractive variant="stage" />
       </div>
     </SlideFrame>

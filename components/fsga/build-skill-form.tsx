@@ -11,7 +11,7 @@
 // falls back to the same pure templateSkillIdea() the server uses — so the
 // draft never depends on network reachability being perfect.
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Pill } from "@/components/atoms";
 import type { SkillIdea } from "@/lib/fsga/skill-idea";
 import { templateSkillIdea } from "@/lib/fsga/template-fallback";
@@ -37,6 +37,16 @@ export function BuildSkillForm({
   onDraftWithAi?: (state: BuildSkillFormState) => void;
 }) {
   const [form, setForm] = useState<BuildSkillFormState>(EMPTY_STATE);
+
+  // Prefill the repeated task from the scorecard's "Name it" hand-off
+  // (?task=…). After hydration only — the page is prerendered, so reading
+  // the URL during the first render would mismatch. Never clobbers typing.
+  useEffect(() => {
+    const fromScorecard = new URLSearchParams(window.location.search).get("task");
+    if (!fromScorecard) return;
+    setForm((f) => (f.repeatedTask ? f : { ...f, repeatedTask: fromScorecard.slice(0, 300) }));
+  }, []);
+
   const hasAnyContent = Object.values(form).some((v) => v.trim().length > 0);
   const allFieldsFilled = Object.values(form).every((v) => v.trim().length > 0);
 

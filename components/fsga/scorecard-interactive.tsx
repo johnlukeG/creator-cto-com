@@ -11,7 +11,7 @@
 // fill rises live as scores come in, with threshold lines for each tier
 // and a bell that rings when the task lands in "Build this Skill".
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Btn } from "@/components/atoms";
 import { BellGlyph } from "@/components/fsga/deck/diagram-glyphs";
 import {
@@ -19,28 +19,38 @@ import {
   SCORECARD_HINT,
   SCORE_TIERS,
   SCORE_TOTAL_MAX,
+  scoreCoaching,
   scoreTotal,
   scoreVerdict,
   type ScoreVerdict,
 } from "@/lib/fsga/scorecard";
+
+// Pack-page results survive reloads (attendees drift between the deck, their
+// pack, and build-your-own during the session). Stage state stays ephemeral.
+const STORAGE_KEY = "fsga-scorecard-v1";
 
 // Stage sizes are 1920×1080 stage pixels (the deck scales the whole box);
 // page sizes are real CSS pixels on the attendee's phone.
 const STYLES = {
   stage: {
     layout: "flex items-stretch gap-16",
-    rows: "flex-1 flex flex-col justify-center gap-4",
-    row: "grid grid-cols-[52px_440px_1fr] items-center gap-x-8",
-    num: "w-[42px] h-[42px] border-2 text-[19px]",
-    question: "text-[22px] font-semibold text-ink leading-[1.25]",
-    label: "text-[14px] uppercase tracking-[0.1em] text-ink-muted mt-1",
-    circles: "grid grid-cols-3 gap-3",
-    circle: "w-full text-center px-4 py-2.5 border-2 text-[18px] rounded-full",
-    verdict: "mt-6 rounded-[20px] border p-5 flex items-center gap-7 min-h-[110px]",
-    verdictLabel: "text-[28px] font-bold tracking-[-0.02em]",
-    verdictDetail: "text-[21px] text-ink-muted leading-[1.35] mt-1",
-    hint: "text-[22px] text-ink-muted leading-[1.4]",
-    reset: "text-[19px]",
+    task: "flex items-center gap-4 mb-4",
+    taskLabel: "text-[20px] font-semibold text-ink shrink-0",
+    taskInput:
+      "flex-1 bg-bg-card border border-line rounded-[12px] px-4 py-2.5 text-[19px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-accent/70",
+    rows: "flex-1 flex flex-col justify-center gap-3",
+    row: "grid grid-cols-[46px_420px_1fr] items-center gap-x-7",
+    num: "w-[38px] h-[38px] border-2 text-[17px]",
+    question: "text-[20px] font-semibold text-ink leading-[1.25]",
+    label: "text-[13px] uppercase tracking-[0.1em] text-ink-muted mt-0.5",
+    circles: "grid grid-cols-3 gap-2.5",
+    circle: "w-full text-center px-3 py-2 border-2 text-[17px] rounded-full",
+    verdict: "mt-5 rounded-[18px] border p-5 flex items-center gap-6 min-h-[92px]",
+    verdictLabel: "text-[25px] font-bold tracking-[-0.02em]",
+    verdictDetail: "text-[19px] text-ink-muted leading-[1.35] mt-0.5",
+    hint: "text-[20px] text-ink-muted leading-[1.4]",
+    coaching: "text-[17px] leading-[1.35]",
+    reset: "text-[18px]",
     meter: "w-[290px]",
     meterTitle: "text-[19px] font-bold tracking-[0.16em]",
     bell: "w-[40px] h-[40px]",
@@ -54,6 +64,10 @@ const STYLES = {
   page: {
     layout: "flex flex-col gap-5",
     rows: "flex flex-col gap-4",
+    task: "flex flex-col gap-1.5 mb-1",
+    taskLabel: "text-[13px] font-semibold text-ink",
+    taskInput:
+      "bg-bg border border-line rounded-[10px] px-3 py-2 text-[13px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-accent/70",
     row: "flex flex-col gap-2",
     num: "w-[22px] h-[22px] border text-[11px]",
     question: "text-[13px] font-semibold text-ink leading-[1.4]",
@@ -64,6 +78,7 @@ const STYLES = {
     verdictLabel: "text-[16px] font-bold tracking-[-0.01px]",
     verdictDetail: "text-[12px] text-ink-muted leading-[1.5] mt-0.5",
     hint: "text-[12px] text-ink-muted leading-[1.5]",
+    coaching: "text-[11px] leading-[1.5]",
     reset: "text-[11px]",
     meter: "w-[150px] shrink-0",
     meterTitle: "text-[10px] font-bold tracking-[0.14em]",
@@ -163,12 +178,64 @@ function ScoreMeter({
 export function ScorecardInteractive({ variant }: { variant: "stage" | "page" }) {
   const s = STYLES[variant];
   const [scores, setScores] = useState<Record<string, number>>({});
+  const [task, setTask] = useState("");
+
+  // Load a saved pack-page result after hydration (never during render —
+  // the page is prerendered, so reading localStorage earlier would mismatch).
+  useEffect(() => {
+    if (variant !== "page") return;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { task?: unknown; scores?: unknown };
+      if (typeof saved.task === "string") setTask(saved.task);
+      if (saved.scores && typeof saved.scores === "object") {
+        const clean: Record<string, number> = {};
+        for (const dim of SCORECARD_DIMENSIONS) {
+          const v = (saved.scores as Record<string, unknown>)[dim.key];
+          if (typeof v === "number" && dim.options.some((o) => o.value === v)) clean[dim.key] = v;
+        }
+        setScores(clean);
+      }
+    } catch {
+      // Corrupt/blocked storage must never break the scorecard.
+    }
+  }, [variant]);
+
+  useEffect(() => {
+    if (variant !== "page") return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ task, scores }));
+    } catch {
+      // Private mode / quota — persistence is best-effort.
+    }
+  }, [variant, task, scores]);
 
   const scoredCount = SCORECARD_DIMENSIONS.filter((d) => scores[d.key]).length;
   const complete = scoredCount === SCORECARD_DIMENSIONS.length;
   const total = scoreTotal(scores);
   const verdict = complete ? scoreVerdict(scores) : null;
+  const coaching = verdict ? scoreCoaching(scores) : [];
   const emphasized = verdict !== null && verdict.tier <= 1;
+  const trimmedTask = task.trim();
+  const buildHref = `/fsga/build-your-own${trimmedTask ? `?task=${encodeURIComponent(trimmedTask)}` : ""}`;
+
+  const taskField = (
+    <div className={s.task}>
+      <label className={s.taskLabel} htmlFor={`scorecard-task-${variant}`}>
+        The task:
+      </label>
+      <input
+        id={`scorecard-task-${variant}`}
+        type="text"
+        value={task}
+        maxLength={120}
+        placeholder="e.g. the monthly sponsor recap"
+        className={s.taskInput}
+        onChange={(event) => setTask(event.target.value)}
+      />
+    </div>
+  );
 
   const verdictPanel = (
     <div
@@ -179,12 +246,22 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
         <>
           <div className="flex-1 min-w-[200px]">
             <div className={`${s.verdictLabel} ${emphasized ? "text-accent" : "text-ink"}`}>
-              {verdict.label}
+              {trimmedTask ? `“${trimmedTask}” — ${verdict.label.toLowerCase()}` : verdict.label}
             </div>
             <div className={s.verdictDetail}>{verdict.detail}</div>
+            {coaching.length > 0 && (
+              <div className="mt-2 flex flex-col gap-1">
+                {coaching.map(({ label, advice }) => (
+                  <div key={label} className={`${s.coaching} text-ink-muted`}>
+                    <span className="text-accent font-bold">→ </span>
+                    <span className="text-ink font-semibold">{label}:</span> {advice}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           {variant === "page" && verdict.tier <= 1 && (
-            <Btn href="/fsga/build-your-own" variant="primary">
+            <Btn href={buildHref} variant="primary">
               Name it
             </Btn>
           )}
@@ -193,6 +270,7 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
             className={`${s.reset} text-ink-muted underline underline-offset-4 hover:text-ink cursor-pointer shrink-0`}
             onClick={(event) => {
               setScores({});
+              setTask("");
               event.currentTarget.blur();
             }}
           >
@@ -280,6 +358,7 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
     return (
       <div className={s.layout}>
         <div className="flex-1 flex flex-col justify-center">
+          {taskField}
           {rows}
           {verdictPanel}
         </div>
@@ -290,6 +369,7 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
 
   return (
     <div className={s.layout}>
+      {taskField}
       {rows}
       <div className="flex items-stretch gap-4 min-h-[240px]">
         <ScoreMeter variant="page" total={total} verdict={verdict} />

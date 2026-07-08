@@ -22,6 +22,9 @@ export interface ScorecardDimension {
    * 1–5 engine, tiers, and meter stay unchanged. Each option is a natural
    * grammatical answer to the question stem. */
   options: ScorecardOption[];
+  /** One actionable line shown when this dimension scores weak — what to
+   * actually do about it, not a restatement of the score. */
+  advice: string;
 }
 
 export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
@@ -35,6 +38,7 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
       { label: "About monthly", value: 3 },
       { label: "Weekly or more", value: 5 },
     ],
+    advice: "Rare tasks make weak first Skills — pick something you face at least monthly.",
   },
   {
     key: "context-reload",
@@ -46,6 +50,7 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
       { label: "A few reminders", value: 3 },
       { label: "A whole briefing", value: 5 },
     ],
+    advice: "If there's almost nothing to re-explain, a plain prompt may cover this one.",
   },
   {
     key: "clear-input",
@@ -57,6 +62,7 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
       { label: "Roughly", value: 3 },
       { label: "Yes — notes, files, a list", value: 5 },
     ],
+    advice: "List what you'd hand a new hire — notes, files, links. That list is the input.",
   },
   {
     key: "clear-output",
@@ -68,6 +74,7 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
       { label: "After a look", value: 3 },
       { label: "Instantly", value: 5 },
     ],
+    advice: "Dig up one past good version and save it as your example output.",
   },
   {
     key: "reusable-judgment",
@@ -79,6 +86,7 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
       { label: "Some patterns", value: 3 },
       { label: "Same every time", value: 5 },
     ],
+    advice: "Write down three rules you always apply — they become the Skill's standards.",
   },
   {
     key: "low-risk",
@@ -90,6 +98,7 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
       { label: "Somewhat", value: 3 },
       { label: "Very", value: 5 },
     ],
+    advice: "Start with an internal, human-reviewed version of this task for your first rep.",
   },
 ];
 
@@ -167,4 +176,21 @@ export function scoreVerdict(scores: Record<string, number>): ScoreVerdict {
     ) ?? SCORE_TIERS[SCORE_TIERS.length - 1];
 
   return { ...tier, total, max: SCORE_TOTAL_MAX };
+}
+
+export interface ScoreCoaching {
+  label: string;
+  advice: string;
+}
+
+/**
+ * The two weakest-scored dimensions (anything below a top answer), worst
+ * first — the "what to do about it" companion to the verdict. Empty when
+ * every dimension got the top answer.
+ */
+export function scoreCoaching(scores: Record<string, number>): ScoreCoaching[] {
+  return SCORECARD_DIMENSIONS.filter((dim) => (scores[dim.key] ?? 0) < SCORE_MAX_PER_DIMENSION)
+    .sort((a, b) => (scores[a.key] ?? 0) - (scores[b.key] ?? 0))
+    .slice(0, 2)
+    .map((dim) => ({ label: dim.label, advice: dim.advice }));
 }
