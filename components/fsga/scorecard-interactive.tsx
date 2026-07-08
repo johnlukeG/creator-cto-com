@@ -30,11 +30,12 @@ const STYLES = {
   stage: {
     layout: "flex items-stretch gap-16",
     rows: "flex-1 flex flex-col justify-center gap-4",
-    row: "grid grid-cols-[430px_1fr] items-center gap-x-10",
-    label: "text-[26px] font-bold text-ink",
-    question: "text-[18px] text-ink-muted leading-[1.25] mt-0.5",
-    circles: "flex flex-wrap gap-3",
-    circle: "px-5 py-2 border-2 text-[19px] rounded-full",
+    row: "grid grid-cols-[52px_440px_1fr] items-center gap-x-8",
+    num: "w-[42px] h-[42px] border-2 text-[19px]",
+    question: "text-[22px] font-semibold text-ink leading-[1.25]",
+    label: "text-[14px] uppercase tracking-[0.1em] text-ink-muted mt-1",
+    circles: "grid grid-cols-3 gap-3",
+    circle: "w-full text-center px-4 py-2.5 border-2 text-[18px] rounded-full",
     verdict: "mt-6 rounded-[20px] border p-5 flex items-center gap-7 min-h-[110px]",
     verdictLabel: "text-[28px] font-bold tracking-[-0.02em]",
     verdictDetail: "text-[21px] text-ink-muted leading-[1.35] mt-1",
@@ -54,10 +55,11 @@ const STYLES = {
     layout: "flex flex-col gap-5",
     rows: "flex flex-col gap-4",
     row: "flex flex-col gap-2",
-    label: "text-[14px] font-bold text-ink",
-    question: "text-[12px] text-ink-muted leading-[1.5]",
-    circles: "flex flex-wrap gap-2 mt-1.5",
-    circle: "px-3.5 py-2 border text-[12px] rounded-full",
+    num: "w-[22px] h-[22px] border text-[11px]",
+    question: "text-[13px] font-semibold text-ink leading-[1.4]",
+    label: "text-[9px] uppercase tracking-[0.1em] text-ink-muted mt-0.5",
+    circles: "grid grid-cols-3 gap-2 mt-1.5",
+    circle: "w-full text-center px-2 py-2 border text-[11px] rounded-full",
     verdict: "rounded-[14px] border p-4 flex-1 flex flex-wrap items-center gap-x-5 gap-y-3",
     verdictLabel: "text-[16px] font-bold tracking-[-0.01px]",
     verdictDetail: "text-[12px] text-ink-muted leading-[1.5] mt-0.5",
@@ -208,12 +210,25 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
 
   const rows = (
     <div className={s.rows}>
-      {SCORECARD_DIMENSIONS.map((dim) => (
-        <div key={dim.key} className={s.row}>
+      {SCORECARD_DIMENSIONS.map((dim, index) => {
+        const answered = scores[dim.key] !== undefined;
+        const numChip = (
+          <span
+            className={`${s.num} rounded-full flex items-center justify-center font-bold shrink-0 transition-colors ${
+              answered ? "bg-accent border-accent text-accent-ink" : "border-line text-ink-muted"
+            }`}
+            aria-hidden
+          >
+            {index + 1}
+          </span>
+        );
+        const stem = (
           <div>
-            <div className={s.label}>{dim.label}</div>
             <div className={s.question}>{dim.question}</div>
+            <div className={s.label}>{dim.label}</div>
           </div>
+        );
+        const chips = (
           <div className={s.circles} role="radiogroup" aria-label={dim.question}>
             {dim.options.map((option) => {
               const selected = scores[dim.key] === option.value;
@@ -223,7 +238,7 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  className={`${s.circle} font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                  className={`${s.circle} font-semibold transition-colors cursor-pointer ${
                     selected
                       ? "bg-accent border-accent text-accent-ink"
                       : "border-line text-ink-muted hover:border-accent/60 hover:text-ink"
@@ -240,8 +255,24 @@ export function ScorecardInteractive({ variant }: { variant: "stage" | "page" })
               );
             })}
           </div>
-        </div>
-      ))}
+        );
+
+        return variant === "stage" ? (
+          <div key={dim.key} className={s.row}>
+            {numChip}
+            {stem}
+            {chips}
+          </div>
+        ) : (
+          <div key={dim.key} className={s.row}>
+            <div className="flex items-start gap-2.5">
+              {numChip}
+              {stem}
+            </div>
+            {chips}
+          </div>
+        );
+      })}
     </div>
   );
 

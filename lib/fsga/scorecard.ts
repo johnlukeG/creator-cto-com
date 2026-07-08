@@ -16,8 +16,11 @@ export interface ScorecardDimension {
   /** The three dimensions the verdict weights hardest (per the outline:
    * "high on frequency, context reload, and reusable judgment"). */
   core: boolean;
-  /** Concrete plain-language answers, strongest first. Values quantize to
-   * 5/3/1 so the 1–5 engine, tiers, and meter stay unchanged. */
+  /** Concrete plain-language answers in ASCENDING order (weakest first,
+   * left→right on screen) — consistent Likert-style direction across every
+   * question, rising toward the meter. Values quantize to 1/3/5 so the
+   * 1–5 engine, tiers, and meter stay unchanged. Each option is a natural
+   * grammatical answer to the question stem. */
   options: ScorecardOption[];
 }
 
@@ -28,64 +31,64 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
     question: "How often does this task come back?",
     core: true,
     options: [
-      { label: "Weekly or more", value: 5 },
-      { label: "Monthly-ish", value: 3 },
       { label: "A few times a year", value: 1 },
+      { label: "About monthly", value: 3 },
+      { label: "Weekly or more", value: 5 },
     ],
   },
   {
     key: "context-reload",
     label: "Context reload",
-    question: "How much re-explaining before the real work starts?",
+    question: "How much re-explaining happens before the real work starts?",
     core: true,
     options: [
-      { label: "A whole briefing", value: 5 },
-      { label: "A few reminders", value: 3 },
       { label: "Almost none", value: 1 },
+      { label: "A few reminders", value: 3 },
+      { label: "A whole briefing", value: 5 },
     ],
   },
   {
     key: "clear-input",
     label: "Clear input",
-    question: "Can you name the raw material that starts it?",
+    question: "Could you point to the raw material that starts it?",
     core: false,
     options: [
+      { label: "Not really", value: 1 },
+      { label: "Roughly", value: 3 },
       { label: "Yes — notes, files, a list", value: 5 },
-      { label: "Sort of", value: 3 },
-      { label: "It's fuzzy", value: 1 },
     ],
   },
   {
     key: "clear-output",
     label: "Clear output",
-    question: "Would you recognize a useful finished version?",
+    question: "How quickly would you recognize a good finished version?",
     core: false,
     options: [
-      { label: "Instantly", value: 5 },
-      { label: "Roughly", value: 3 },
       { label: "Hard to say", value: 1 },
+      { label: "After a look", value: 3 },
+      { label: "Instantly", value: 5 },
     ],
   },
   {
     key: "reusable-judgment",
     label: "Reusable judgment",
-    question: "Do you apply the same standards or rules each time?",
+    question: "How similar are the rules you apply each time?",
     core: true,
     options: [
-      { label: "Same rules every time", value: 5 },
+      { label: "Different every time", value: 1 },
       { label: "Some patterns", value: 3 },
-      { label: "Every time is different", value: 1 },
+      { label: "Same every time", value: 5 },
     ],
   },
   {
     key: "low-risk",
     label: "Low-risk first draft",
-    question: "Is a better first draft useful even with human review?",
+    question: "How useful would a good first draft be, with you reviewing it?",
     core: false,
     options: [
-      { label: "Very useful", value: 5 },
+      { label: "Not much", value: 1 },
       { label: "Somewhat", value: 3 },
-      { label: "Too risky", value: 1 },
+      { label: "Very", value: 5 },
     ],
   },
 ];
