@@ -7,11 +7,10 @@ import { getSkillBySlug } from "@/lib/fsga/skills/library";
 import type { Skill } from "@/lib/fsga/skills/types";
 import type { PublicPack, PublicPackItem } from "@/lib/fsga/db/queries";
 import { PackHeader } from "./pack-header";
-import { PackLeadForm } from "./pack-lead-form";
 import { ScorecardInteractive } from "./scorecard-interactive";
 import { SkillCard } from "./skill-card";
 
-export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: string }) {
+export function PackView({ pack }: { pack: PublicPack }) {
   const role = pack.attendee.title?.trim() || "my role";
   const company = pack.attendee.company?.trim() || "my company";
 
@@ -53,10 +52,6 @@ export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: strin
             rank={item.rank}
           />
         ))}
-      </div>
-
-      <div className="mt-8">
-        <PackLeadForm packSlug={packSlug} />
       </div>
 
       <div className="mt-10 bg-bg-card border border-line rounded-[18px] p-6 sm:p-7">

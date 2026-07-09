@@ -2,12 +2,12 @@
 
 // FSGA workshop — starter Skill Pack flow for attendees not in the imported
 // list (or who just want to explore). Three chip-picker steps, computed
-// client-side via the pure matchSkills() (no DB), then an optional lead
-// capture form. Selections mirror into ?role=&company=&pain= so the result
-// is shareable/restorable: landing with all params present (or just `role`)
-// renders results immediately instead of replaying the wizard.
+// client-side via the pure matchSkills() (no DB). Selections mirror into
+// ?role=&company=&pain= so the result is shareable/restorable: landing with
+// all params present (or just `role`) renders results immediately instead
+// of replaying the wizard.
 
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { matchSkills } from "@/lib/fsga/matching";
 import { getSkillBySlug } from "@/lib/fsga/skills/library";
@@ -21,7 +21,6 @@ import {
   type WorkflowPain,
 } from "@/lib/fsga/skills/types";
 import type { Skill } from "@/lib/fsga/skills/types";
-import { BtnButton, Field, TextInput } from "./atoms";
 import { SkillCard } from "./skill-card";
 
 const ROLE_LABELS: Record<RoleCategory, string> = {
@@ -184,10 +183,6 @@ export function StarterFlow() {
             />
           ))}
         </div>
-
-        <div className="mt-8">
-          <LeadCaptureForm role={role} pain={pain} />
-        </div>
       </div>
     );
   }
@@ -256,79 +251,3 @@ export function StarterFlow() {
   );
 }
 
-function LeadCaptureForm({ role, pain }: { role: RoleCategory; pain: WorkflowPain | null }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subscribe, setSubscribe] = useState(false);
-  const [website, setWebsite] = useState(""); // honeypot
-  const [status, setStatus] = useState<"idle" | "submitting" | "sent" | "error">("idle");
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setStatus("submitting");
-    try {
-      const res = await fetch("/api/fsga/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          role,
-          workflowInterest: pain ?? undefined,
-          subscribe,
-          requestedPackCopy: true,
-          source: "starter_flow",
-          website,
-        }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) throw new Error("lead submit failed");
-      setStatus("sent");
-    } catch {
-      setStatus("error");
-    }
-  }
-
-  if (status === "sent") {
-    return (
-      <div className="bg-bg-card border border-line rounded-xl p-5 text-[13px] text-accent text-center">
-        Sent — check your inbox after the event.
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="bg-bg-card border border-line rounded-[18px] p-6 grid gap-4">
-      <div className="text-[13px] font-bold tracking-[-0.03em]">Want this pack emailed to you?</div>
-
-      {/* Honeypot — visually hidden, never shown to real attendees. */}
-      <input
-        type="text"
-        name="website"
-        value={website}
-        onChange={(e) => setWebsite(e.target.value)}
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-        className="absolute left-[-9999px] w-px h-px overflow-hidden opacity-0"
-      />
-
-      <Field label="Name">
-        <TextInput value={name} onChange={(e) => setName(e.target.value)} required />
-      </Field>
-      <Field label="Email">
-        <TextInput type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-      </Field>
-      <label className="flex items-center gap-2 text-[12px] text-ink-muted">
-        <input type="checkbox" checked={subscribe} onChange={(e) => setSubscribe(e.target.checked)} />
-        Subscribe to Creator CTO updates
-      </label>
-
-      {status === "error" && <p className="text-[12px] text-ink-faint">Something went wrong — try again.</p>}
-
-      <BtnButton type="submit" disabled={status === "submitting"}>
-        {status === "submitting" ? "Sending…" : "Email me this pack"}
-      </BtnButton>
-    </form>
-  );
-}

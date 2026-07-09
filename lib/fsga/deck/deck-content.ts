@@ -285,7 +285,7 @@ export const DECK_SLIDES: SlideContent[] = [
       "Turn candidate notes into an interview prep brief using the role requirements and hiring criteria.",
     ],
     notes:
-      "This sentence is not the whole Skill — it's the starting point. It should name the input, the output, and what standards, examples, or process the AI needs to use. [Read two of the examples slowly.] Before you leave, email yourself your pack and your worksheet — there's a button on your pack page. The goal is to leave with one thing you can try.",
+      "This sentence is not the whole Skill — it's the starting point. It should name the input, the output, and what standards, examples, or process the AI needs to use. [Read two of the examples slowly.] Before you leave, copy or download the Skills you want to keep — the buttons are right on your pack page. The goal is to leave with one thing you can try.",
   },
   {
     id: "thanks",
