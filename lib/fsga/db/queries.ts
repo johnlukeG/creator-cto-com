@@ -57,6 +57,11 @@ export interface PublicPackItem {
   customReason: string | null;
   customExample: string | null;
   recommendedFirst: boolean;
+  /**
+   * Present only on a curated signature hero (static-data mode). Overrides the
+   * card's displayed name and starter prompt. The DB path never populates this.
+   */
+  signature?: { name: string; starterPrompt: string } | null;
 }
 
 export interface PublicPack {
