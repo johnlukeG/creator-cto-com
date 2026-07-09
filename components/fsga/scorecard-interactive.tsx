@@ -1,6 +1,6 @@
 "use client";
 
-// FSGA workshop — interactive Skill Opportunity Scorecard. Two surfaces,
+// FSGA workshop — interactive Skill Opportunity Calculator. Two surfaces,
 // one component: `variant="stage"` renders in deck stage pixels (JL scores
 // a volunteer's task live on the projected slide), `variant="page"` renders
 // at web scale on the attendee's pack page (they score their own task on a
@@ -27,7 +27,10 @@ import {
 
 // Pack-page results survive reloads (attendees drift between the deck, their
 // pack, and build-your-own during the session). Stage state stays ephemeral.
-const STORAGE_KEY = "fsga-scorecard-v1";
+// v2: the four-dimension calculator (new keys + 1–5 answers) — v1's saved
+// six-dimension scores don't map, so the loader's per-dimension validation
+// would drop them anyway; the fresh key just keeps storage clean.
+const STORAGE_KEY = "fsga-scorecard-v2";
 
 // Stage sizes are 1920×1080 stage pixels (the deck scales the whole box);
 // page sizes are real CSS pixels on the attendee's phone.
@@ -38,13 +41,13 @@ const STYLES = {
     taskLabel: "text-[20px] font-semibold text-ink shrink-0",
     taskInput:
       "flex-1 bg-bg-card border border-line rounded-[12px] px-4 py-2.5 text-[19px] text-ink placeholder:text-ink-muted/50 outline-none focus:border-accent/70",
-    rows: "flex-1 flex flex-col justify-center gap-3",
-    row: "grid grid-cols-[46px_420px_1fr] items-center gap-x-7",
+    rows: "flex-1 flex flex-col justify-center gap-4",
+    row: "grid grid-cols-[46px_360px_1fr] items-center gap-x-7",
     num: "w-[38px] h-[38px] border-2 text-[17px]",
     question: "text-[20px] font-semibold text-ink leading-[1.25]",
     label: "text-[13px] uppercase tracking-[0.1em] text-ink-muted mt-0.5",
-    circles: "grid grid-cols-3 gap-2.5",
-    circle: "w-full text-center px-3 py-2 border-2 text-[17px] rounded-full",
+    circles: "grid grid-cols-5 gap-2.5",
+    circle: "w-full text-center px-2 py-2.5 border-2 text-[15px] rounded-full",
     verdict: "mt-5 rounded-[18px] border p-5 flex items-center gap-6 min-h-[92px]",
     verdictLabel: "text-[25px] font-bold tracking-[-0.02em]",
     verdictDetail: "text-[19px] text-ink-muted leading-[1.35] mt-0.5",
@@ -72,8 +75,10 @@ const STYLES = {
     num: "w-[22px] h-[22px] border text-[11px]",
     question: "text-[13px] font-semibold text-ink leading-[1.4]",
     label: "text-[9px] uppercase tracking-[0.1em] text-ink-muted mt-0.5",
-    circles: "grid grid-cols-3 gap-2 mt-1.5",
-    circle: "w-full text-center px-2 py-2 border text-[11px] rounded-full",
+    // 5 answers per dimension: content-sized chips that wrap, still reading
+    // weakest→strongest left-to-right on a phone width.
+    circles: "flex flex-wrap gap-2 mt-1.5",
+    circle: "text-center px-3 py-2 border text-[11px] rounded-full",
     verdict: "rounded-[14px] border p-4 flex-1 flex flex-wrap items-center gap-x-5 gap-y-3",
     verdictLabel: "text-[16px] font-bold tracking-[-0.01px]",
     verdictDetail: "text-[12px] text-ink-muted leading-[1.5] mt-0.5",

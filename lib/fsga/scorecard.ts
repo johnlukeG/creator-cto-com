@@ -1,11 +1,15 @@
-// FSGA workshop — the Skill Opportunity Scorecard: shared dimensions and
+// FSGA workshop — the Skill Opportunity Calculator: shared dimensions and
 // verdict logic for the two interactive surfaces (the act-4 deck slide and
 // the attendee pack page). Data + pure functions only — no React, no DB —
 // so the deck stays DB-free and both surfaces can't drift apart.
+//
+// Four dimensions × 1–5 each (per the outline's calculator): Repeat Rate,
+// Judgment Reload, Output Clarity, First Draft Value. Totals band into
+// 16–20 / 11–15 / 6–10 / 4–5 verdicts.
 
 export interface ScorecardOption {
   label: string;
-  /** Score contributed toward the total (1–5 scale under the hood). */
+  /** Score contributed toward the total (1–5 scale). */
   value: number;
 }
 
@@ -13,14 +17,14 @@ export interface ScorecardDimension {
   key: string;
   label: string;
   question: string;
-  /** The three dimensions the verdict weights hardest (per the outline:
-   * "high on frequency, context reload, and reusable judgment"). */
+  /** The dimensions the outline's bottom line weights hardest ("the best
+   * first Skills usually score high on repeat rate, judgment reload, and
+   * first draft value"). */
   core: boolean;
   /** Concrete plain-language answers in ASCENDING order (weakest first,
    * left→right on screen) — consistent Likert-style direction across every
-   * question, rising toward the meter. Values quantize to 1/3/5 so the
-   * 1–5 engine, tiers, and meter stay unchanged. Each option is a natural
-   * grammatical answer to the question stem. */
+   * question, rising toward the meter. Values map 1–5, one per answer.
+   * Each option is a natural grammatical answer to the question stem. */
   options: ScorecardOption[];
   /** One actionable line shown when this dimension scores weak — what to
    * actually do about it, not a restatement of the score. */
@@ -29,74 +33,58 @@ export interface ScorecardDimension {
 
 export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
   {
-    key: "frequency",
-    label: "Frequency",
+    key: "repeat-rate",
+    label: "Repeat rate",
     question: "How often does this task come back?",
     core: true,
     options: [
-      { label: "A few times a year", value: 1 },
-      { label: "About monthly", value: 3 },
-      { label: "Weekly or more", value: 5 },
+      { label: "Rarely", value: 1 },
+      { label: "Quarterly", value: 2 },
+      { label: "Monthly", value: 3 },
+      { label: "Weekly", value: 4 },
+      { label: "Daily", value: 5 },
     ],
     advice: "Rare tasks make weak first Skills — pick something you face at least monthly.",
   },
   {
-    key: "context-reload",
-    label: "Context reload",
-    question: "How much re-explaining happens before the real work starts?",
+    key: "judgment-reload",
+    label: "Judgment reload",
+    question: "How much thinking do you reload each time?",
     core: true,
     options: [
       { label: "Almost none", value: 1 },
-      { label: "A few reminders", value: 3 },
+      { label: "Simple cleanup", value: 2 },
+      { label: "Some judgment", value: 3 },
+      { label: "Several standards", value: 4 },
       { label: "A whole briefing", value: 5 },
     ],
     advice: "If there's almost nothing to re-explain, a plain prompt may cover this one.",
   },
   {
-    key: "clear-input",
-    label: "Clear input",
-    question: "Could you point to the raw material that starts it?",
+    key: "output-clarity",
+    label: "Output clarity",
+    question: "How clear is the useful finished thing?",
     core: false,
     options: [
-      { label: "Not really", value: 1 },
-      { label: "Roughly", value: 3 },
-      { label: "Yes — notes, files, a list", value: 5 },
-    ],
-    advice: "List what you'd hand a new hire — notes, files, links. That list is the input.",
-  },
-  {
-    key: "clear-output",
-    label: "Clear output",
-    question: "How quickly would you recognize a good finished version?",
-    core: false,
-    options: [
-      { label: "Hard to say", value: 1 },
-      { label: "After a look", value: 3 },
-      { label: "Instantly", value: 5 },
+      { label: "Hard to describe", value: 1 },
+      { label: "Fuzzy", value: 2 },
+      { label: "Mostly clear", value: 3 },
+      { label: "Clear", value: 4 },
+      { label: "Clear + examples", value: 5 },
     ],
     advice: "Dig up one past good version and save it as your example output.",
   },
   {
-    key: "reusable-judgment",
-    label: "Reusable judgment",
-    question: "How similar are the rules you apply each time?",
+    key: "first-draft-value",
+    label: "First draft value",
+    question: "Would a stronger first draft save meaningful time?",
     core: true,
     options: [
-      { label: "Different every time", value: 1 },
-      { label: "Some patterns", value: 3 },
-      { label: "Same every time", value: 5 },
-    ],
-    advice: "Write down three rules you always apply — they become the Skill's standards.",
-  },
-  {
-    key: "low-risk",
-    label: "Low-risk first draft",
-    question: "How useful would a good first draft be, with you reviewing it?",
-    core: false,
-    options: [
-      { label: "Not much", value: 1 },
-      { label: "Somewhat", value: 3 },
-      { label: "Very", value: 5 },
+      { label: "Not worth it", value: 1 },
+      { label: "Maybe sometimes", value: 2 },
+      { label: "Needs revision", value: 3 },
+      { label: "Light editing", value: 4 },
+      { label: "Instantly useful", value: 5 },
     ],
     advice: "Start with an internal, human-reviewed version of this task for your first rep.",
   },
@@ -105,8 +93,8 @@ export const SCORECARD_DIMENSIONS: ScorecardDimension[] = [
 export const SCORE_MAX_PER_DIMENSION = 5;
 export const SCORE_TOTAL_MAX = SCORECARD_DIMENSIONS.length * SCORE_MAX_PER_DIMENSION;
 
-/** Shown before all six dimensions are scored. */
-export const SCORECARD_HINT = "Answer all six for the verdict.";
+/** Shown before all four dimensions are scored. */
+export const SCORECARD_HINT = "Answer all four for the verdict.";
 
 export interface ScoreTier {
   /** 0 = strongest. Drives emphasis styling on both surfaces. */
@@ -123,28 +111,27 @@ export interface ScoreTier {
 export const SCORE_TIERS: ScoreTier[] = [
   {
     tier: 0,
-    minTotal: 20,
-    minCoreTotal: 12,
-    label: "Build this Skill",
+    minTotal: 16,
+    label: "Strong Skill candidate",
     detail: "This is your first Skill. Name it and spec it before you leave.",
   },
   {
     tier: 1,
-    minTotal: 18,
-    label: "Strong candidate",
-    detail: "Sharpen the input and the output, then build it.",
+    minTotal: 11,
+    label: "Worth testing",
+    detail: "Sharpen the input and the output, then run a first rep.",
   },
   {
     tier: 2,
-    minTotal: 12,
-    label: "Not yet",
+    minTotal: 6,
+    label: "Maybe later",
     detail: "Run it as a one-off prompt a few times first.",
   },
   {
     tier: 3,
     minTotal: 0,
-    label: "Skip for now",
-    detail: "Pick a task that comes back more often.",
+    label: "Probably just prompt it",
+    detail: "Pick a task that repeats more and reloads more judgment.",
   },
 ];
 
@@ -160,8 +147,8 @@ export function scoreTotal(scores: Record<string, number>): number {
 
 /**
  * Verdict over a complete set of scores, keyed by dimension key, each 1–5.
- * Core dimensions gate the top tier: a flashy-but-rare task can't score its
- * way into "build this" on volume alone.
+ * Tiers may additionally gate on the core-dimension total (none currently
+ * do — the outline's calculator bands on raw total alone).
  */
 export function scoreVerdict(scores: Record<string, number>): ScoreVerdict {
   const total = scoreTotal(scores);
@@ -183,13 +170,17 @@ export interface ScoreCoaching {
   advice: string;
 }
 
+/** A dimension only gets coached below this score — the advice lines are
+ * written for genuinely weak answers, and a 4/5 doesn't need fixing. */
+const COACHING_THRESHOLD = 4;
+
 /**
- * The single weakest-scored dimension (if any scored below a top answer) —
+ * The single weakest-scored dimension (if any scored genuinely weak) —
  * the one "what to do about it" line that accompanies the verdict. Empty
- * when every dimension got the top answer.
+ * when every dimension scored strong.
  */
 export function scoreCoaching(scores: Record<string, number>): ScoreCoaching[] {
-  return SCORECARD_DIMENSIONS.filter((dim) => (scores[dim.key] ?? 0) < SCORE_MAX_PER_DIMENSION)
+  return SCORECARD_DIMENSIONS.filter((dim) => (scores[dim.key] ?? 0) < COACHING_THRESHOLD)
     .sort((a, b) => (scores[a.key] ?? 0) - (scores[b.key] ?? 0))
     .slice(0, 1)
     .map((dim) => ({ label: dim.label, advice: dim.advice }));

@@ -61,11 +61,11 @@ export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: strin
 
       <div className="mt-10 bg-bg-card border border-line rounded-[18px] p-6 sm:p-7">
         <div className="text-[10px] tracking-[0.08em] uppercase text-ink-faint">
-          The Skill Opportunity Scorecard
+          The Skill Opportunity Calculator
         </div>
         <h2 className="text-[18px] font-bold tracking-[-0.02em] mt-2">Should it become a Skill?</h2>
         <p className="text-[13px] text-ink-muted leading-[1.6] mt-1.5 mb-5">
-          Pick one repeated task from your week — yours, not ours — and answer six quick questions.
+          Pick one repeated task from your week — yours, not ours — and answer four quick questions.
           The meter climbs as you go.
         </p>
         <ScorecardInteractive variant="page" />
