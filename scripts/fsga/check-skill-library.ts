@@ -80,6 +80,29 @@ async function main(): Promise<void> {
     fail("a no-companyType 'other' pack should be entirely ubiquitous-core skills");
   }
 
+  // skill-export helpers: placeholder fill leaves no [ROLE]/[COMPANY] residue
+  // but preserves other [PASTE …] placeholders; SKILL.md is well-formed; the
+  // build-your-own link carries the four prefill params.
+  const exp = await import("../../lib/fsga/skill-export");
+  const sample = SKILLS.find((s) => s.starterPrompt.includes("[ROLE]") && s.starterPrompt.includes("[COMPANY]"));
+  if (!sample) fail("expected at least one library skill whose starterPrompt has [ROLE] and [COMPANY]");
+  const filled = exp.fillPlaceholders(sample!.starterPrompt, { role: "Founder", company: "Fantasy Cares" });
+  if (filled.includes("[ROLE]") || filled.includes("[COMPANY]")) fail("fillPlaceholders left [ROLE]/[COMPANY] residue");
+  if (!filled.includes("Fantasy Cares") || !filled.includes("Founder")) fail("fillPlaceholders did not inject role/company");
+  if (sample!.starterPrompt.includes("[PASTE") && !filled.includes("[PASTE")) fail("fillPlaceholders wrongly stripped a [PASTE …] placeholder");
+
+  const md = exp.compileSkillFile(sample!);
+  if (!md.startsWith("---\nname: ")) fail("compileSkillFile missing YAML frontmatter");
+  if (!md.includes("\n## Process\n") || !md.includes("\n## Starter prompt\n")) fail("compileSkillFile missing required sections");
+
+  const prompt = exp.compileSkillPrompt(sample!);
+  if (!prompt.includes(sample!.name) || prompt.trim() === "") fail("compileSkillPrompt produced empty/nameless output");
+
+  const q = exp.buildYourOwnQuery(sample!);
+  if (!q.startsWith("?") || !q.includes("task=") || !q.includes("input=") || !q.includes("output=") || !q.includes("goal=")) {
+    fail(`buildYourOwnQuery missing prefill params: ${q}`);
+  }
+
   console.log(
     `fsga:check OK — ${SKILLS.length} skills across ${SKILL_CATEGORIES.length} categories; ` +
       `all ${ROLE_CATEGORIES.length} role categories yield >= 5 matches; all rule-table slugs valid.`,
