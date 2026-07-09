@@ -275,6 +275,13 @@ const RAIN_COLUMNS = Array.from({ length: 16 }, (_, i) => ({
   ),
 }));
 
+// The clip is committed at public/fsga/ so the offline/static deck serves it
+// from the same origin — no venue-wifi dependency. No autoplay: JL clicks
+// play (a user gesture, so audio is allowed); DeckShell's key handler
+// ignores events while the <video> has focus so Space scrubs the clip
+// instead of advancing the slide.
+const MATRIX_CLIP_SRC = "/fsga/matrix-know-how.mp4";
+
 function MatrixSlide({ content }: { content: SlideContent }) {
   return (
     <SlideFrame eyebrow={content.eyebrow}>
@@ -293,11 +300,19 @@ function MatrixSlide({ content }: { content: SlideContent }) {
           ))}
         </div>
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center">
-          <h2 className="text-[104px] font-bold tracking-[-0.03em] leading-[1.05] text-ink text-balance">
+          <h2 className="text-[64px] font-bold tracking-[-0.03em] leading-[1.05] text-ink text-balance">
             {content.title}
           </h2>
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption -- JL narrates live; the clip is a stage prop */}
+          <video
+            src={MATRIX_CLIP_SRC}
+            controls
+            preload="auto"
+            playsInline
+            className="mt-8 w-[960px] aspect-[854/468] rounded-[20px] border border-line bg-black"
+          />
           {content.body && (
-            <p className="text-[32px] text-ink-muted leading-[1.5] mt-10 max-w-[1150px]">{content.body}</p>
+            <p className="text-[26px] text-ink-muted leading-[1.5] mt-7 max-w-[1150px]">{content.body}</p>
           )}
         </div>
       </div>

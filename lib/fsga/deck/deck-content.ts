@@ -122,7 +122,7 @@ export const DECK_SLIDES: SlideContent[] = [
     title: "Load the know-how",
     body: "In The Matrix, Trinity needs to fly a helicopter. The system loads the capability the moment she needs it.",
     notes:
-      "You all know this scene: Trinity needs to fly a helicopter, and the system loads the capability the moment she needs it. [Pause on the visual.] Most of us get the idea immediately — a task shows up, you need a capability, the right know-how gets loaded. AI Skills are the grounded version of that. You're not downloading kung fu; you're packaging instructions, context, standards, and examples so the AI can reuse them. Now let's bring that back down to Monday-morning work.",
+      "You all know this scene. [Click play — 36 seconds, audio up. Let 'Tank, I need a pilot program' land, cut after the takeoff if pressed.] Trinity needs to fly a helicopter, and the system loads the capability the moment she needs it. Most of us get the idea immediately — a task shows up, you need a capability, the right know-how gets loaded. AI Skills are the grounded version of that. You're not downloading kung fu; you're packaging instructions, context, standards, and examples so the AI can reuse them. [Click somewhere off the video before using arrow keys.] Now let's bring that back down to Monday-morning work.",
   },
   {
     id: "skill-definition",

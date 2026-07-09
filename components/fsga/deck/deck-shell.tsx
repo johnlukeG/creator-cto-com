@@ -47,7 +47,9 @@ function useStageScale(): number {
 function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   const tag = target.tagName;
-  return tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable;
+  // VIDEO: while the act-2 Matrix clip has focus, Space/arrows scrub the
+  // player — they must not also navigate the deck.
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "VIDEO" || target.isContentEditable;
 }
 
 function toggleFullscreen() {
