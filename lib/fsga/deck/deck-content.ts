@@ -13,9 +13,9 @@ import { getSkillBySlug } from "../skills/library";
 
 export type SlideKind =
   | "title"
-  | "orbit"
-  | "loading"
-  | "grid"
+  | "pattern"
+  | "layers"
+  | "test"
   | "matrix"
   | "folder"
   | "compare"
@@ -58,59 +58,74 @@ export const DECK_SLIDES: SlideContent[] = [
       "Hey everyone — I'm JL, Creator CTO, and here's the whole session in one sentence: we find one repeated task from your real work and turn it into the start of a reusable AI Skill. Quick show of hands before we get going: how familiar are you with AI Skills — never heard of them, heard the term, or already using them? [Toss the football to someone; get one answer out loud.] Calibrate act two off the hands: mostly blank faces, slow down on the definition; hands on 'already using,' lean into the scorecard and the packs.",
   },
   {
-    id: "coming-back",
+    id: "same-shape",
     act: 1,
-    kind: "orbit",
-    eyebrow: "act one · repeated work",
-    title: "The work that keeps coming back",
-    big: "Some of your most valuable work keeps coming back in slightly different clothes.",
-    body: "Different prospect. Different sponsor. Different employee. Different investor. Same kind of thinking.",
-    visual: "Same thinking. New version.",
+    kind: "pattern",
+    eyebrow: "act one · the pattern",
+    title: "Same shape. New details.",
+    body: "Different situation. Same shape underneath.",
+    // "group: label" — situation cards flow through one shared pipeline into
+    // outputs. Situation icons resolve by label in slides.tsx.
     bullets: [
-      "sponsor call",
-      "hiring process",
-      "investor update",
-      "board deck",
-      "sales follow-up",
-      "content plan",
-      "partner research",
-      "customer recap",
+      "situation: Sponsor call",
+      "situation: New hire",
+      "situation: Investor update",
+      "situation: Customer recap",
+      "step: Gather context",
+      "step: Apply judgment",
+      "step: Create the useful thing",
+      "output: Call prep",
+      "output: Interview brief",
+      "output: Update memo",
+      "output: Recap email",
     ],
     notes:
-      "I'm not only talking about busywork — a lot of your repeated work is high-judgment work. [Sweep the orbit labels.] The sponsor call, the hiring process, the investor update, the board deck: different prospect, different sponsor, different employee every time. The details change, but the shape of the thinking keeps coming back — the same work in slightly different clothes.",
+      "The surface changes: one day it's a sponsor, the next a candidate, the next an investor. [Trace the flow top to bottom.] Underneath there's a familiar pattern — gather context, apply judgment, create the useful thing. Different names in, different documents out, same shape in the middle. That hidden shape is what we care about today.",
   },
   {
-    id: "context-reload",
+    id: "hidden-work",
     act: 1,
-    kind: "loading",
-    eyebrow: "act one · the hidden tax",
-    title: "Where the waste actually is",
-    big: "The waste isn't only doing it again. It's reloading the context again.",
-    body: "The goal. The audience. The constraints. The tone. The standard. The next step.",
-    bullets: ["Context", "Judgment", "Steps", "Standards", "Format"],
-    notes:
-      "Here's where the waste actually is. Before you produce the thing, you have to reload all the thinking around the thing: what is this for, who is it for, what does good look like, what should happen next. [Point at the loading rows.] That reload — context, judgment, steps, standards, format — is the tax, and you pay it every single time, even on work you're great at.",
-  },
-  {
-    id: "spot-the-repeat",
-    act: 1,
-    kind: "grid",
-    eyebrow: "act one · spot the repeat",
-    title: "You probably repeat one of these",
-    // "iconKey: label" — icon keys resolve against TASK_ICONS in
-    // components/fsga/deck/task-icons.tsx; unknown keys render label-only.
+    kind: "layers",
+    eyebrow: "act one · the hidden work",
+    title: "The part you keep rebuilding",
+    body: "The output is visible. The judgment behind it is the reusable part.",
+    // "layer: label" — visible artifacts above the waterline, judgment below.
     bullets: [
-      "call: Prep for a sponsor or partnership call",
-      "hire: Gather background on a prospective new hire",
-      "meeting: Turn a meeting into next steps and follow-ups",
-      "recap: Synthesize a recap for investors, employees, or customers",
-      "formats: Convert one content idea into posts, clips, emails, and talking points",
-      "review: Review a potential partner, vendor, or acquisition target",
-      "industry: Summarize industry movement for leadership",
-      "deck: Rebuild a sales, strategy, or board deck from scattered notes",
+      "visible: email",
+      "visible: deck",
+      "visible: recap",
+      "visible: brief",
+      "visible: follow-up",
+      "hidden: audience",
+      "hidden: goal",
+      "hidden: context",
+      "hidden: standards",
+      "hidden: examples",
+      "hidden: tone",
+      "hidden: next step",
     ],
     notes:
-      "Have a look at this board. Don't worry about picking the best one yet — just notice which one feels familiar. [Give them a beat to scan.] Which of these shows up in your work — or what would you add to this board? [Toss the football; take one or two answers out loud.] Hold onto yours; it's your raw material for the rest of the session.",
+      "The email is visible. The deck is visible. The recap is visible. But the repeatable value sits underneath the waterline: who is this for, what matters here, what does good look like, what should happen next. [Point below the line.] That's the part you keep rebuilding from scratch every time — and that's exactly the stuff a good Skill can carry for you.",
+  },
+  {
+    id: "repeat-test",
+    act: 1,
+    kind: "test",
+    eyebrow: "act one · spot the opportunity",
+    title: "The Repeat Test",
+    body: "If the standards repeat, it may be a Skill.",
+    // "q: question" checklist, then "row: Task | Repeated standards | Useful
+    // first draft" example table rows.
+    bullets: [
+      "q: Do I do this more than once?",
+      "q: Do I keep explaining the same standards?",
+      "q: Would a strong first draft save time?",
+      "row: Sponsor call prep | What we sell, who they are, smart questions | Call brief",
+      "row: Investor update | Metrics, tone, priorities | Update memo",
+      "row: Newsletter draft | Voice, audience, CTA | Email draft",
+    ],
+    notes:
+      "Here's the quick test. Do you do it more than once? Do you keep re-explaining what good looks like? Would a better first draft help, even with a human reviewing it? [Walk one table row end to end.] If it's yes, yes, yes — you've got a Skill candidate. [Toss the football:] what's one task in your world that passes this test? [Take one or two answers out loud.]",
   },
 
   // ── Act 2 — name the concept ─────────────────────────────────────────────

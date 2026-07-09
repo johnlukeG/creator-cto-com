@@ -79,8 +79,6 @@ function SlideFrame({
 // Which single phrase to highlight per slide id — a presentation choice not
 // encoded in deck-content.ts's copy. Optional: slides not listed render plain.
 const ACCENT_PHRASES: Record<string, string> = {
-  "coming-back": "keeps coming back",
-  "context-reload": "reloading the context",
   "skill-definition": "reusable know-how",
 };
 
@@ -139,124 +137,174 @@ function TitleSlide({ content }: { content: SlideContent }) {
   );
 }
 
-// Hand-tuned orbit positions (percent of the visual area) for up to eight
-// labels — deterministic so SSR and client render identically.
-const ORBIT_POSITIONS: { x: number; y: number }[] = [
-  { x: 10, y: 16 },
-  { x: 36, y: 5 },
-  { x: 64, y: 12 },
-  { x: 89, y: 22 },
-  { x: 9, y: 74 },
-  { x: 34, y: 88 },
-  { x: 63, y: 84 },
-  { x: 88, y: 68 },
-];
+// "Same shape, new details": four situations funnel through one shared
+// pipeline into four outputs. Situation icons resolve by label — a
+// presentation choice, like ACCENT_PHRASES.
+const SITUATION_ICONS: Record<string, string> = {
+  "Sponsor call": "call",
+  "New hire": "hire",
+  "Investor update": "industry",
+  "Customer recap": "recap",
+};
 
-function OrbitSlide({ content }: { content: SlideContent }) {
-  const labels = content.bullets ?? [];
+function PatternSlide({ content }: { content: SlideContent }) {
+  const items = (content.bullets ?? []).map(splitBullet);
+  const situations = items.filter((i) => i.key === "situation").map((i) => i.text);
+  const steps = items.filter((i) => i.key === "step").map((i) => i.text);
+  const outputs = items.filter((i) => i.key === "output").map((i) => i.text);
+
   return (
     <SlideFrame eyebrow={content.eyebrow}>
-      <h2 className="text-[54px] font-bold tracking-[-0.03em] leading-[1.12] text-ink text-balance max-w-[1400px] shrink-0">
-        {withAccent(content.big ?? content.title, ACCENT_PHRASES[content.id])}
+      <h2 className="text-[56px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
+        {content.title}
       </h2>
-      <div className="flex-1 min-h-0 relative my-6">
-        {content.visual && (
-          <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[58px] font-bold tracking-[-0.02em] text-accent whitespace-nowrap">
-            {content.visual}
-          </p>
-        )}
-        {labels.map((label, i) => {
-          const pos = ORBIT_POSITIONS[i % ORBIT_POSITIONS.length];
-          return (
-            <span
-              key={label}
-              className="absolute -translate-x-1/2 -translate-y-1/2 px-7 py-3.5 rounded-full border border-line bg-bg-card text-[26px] text-ink-muted whitespace-nowrap"
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-            >
-              {label}
-            </span>
-          );
-        })}
-      </div>
-      {content.body && (
-        <p className="text-[30px] text-ink-muted leading-[1.5] max-w-[1400px] shrink-0">{content.body}</p>
-      )}
-    </SlideFrame>
-  );
-}
-
-// "Mental loading screen": one row per thing you re-load before the real
-// work starts. Fill widths are decorative, fixed for SSR determinism.
-const LOADING_FILLS = [0.86, 0.62, 0.91, 0.54, 0.73];
-
-function LoadingSlide({ content }: { content: SlideContent }) {
-  const rows = content.bullets ?? [];
-  return (
-    <SlideFrame eyebrow={content.eyebrow}>
-      <h2 className="text-[58px] font-bold tracking-[-0.03em] leading-[1.1] text-ink text-balance max-w-[1500px] shrink-0">
-        {withAccent(content.big ?? content.title, ACCENT_PHRASES[content.id])}
-      </h2>
-      <div className="flex-1 min-h-0 flex items-center">
-        <div className="w-[1150px] bg-bg-card border border-line rounded-[24px] p-12 flex flex-col gap-7">
-          {rows.map((row, i) => {
-            const fill = LOADING_FILLS[i % LOADING_FILLS.length];
+      <div className="flex-1 min-h-0 flex flex-col justify-center gap-4 mt-4">
+        <div className="grid grid-cols-4 gap-5">
+          {situations.map((label) => {
+            const Icon = TASK_ICONS[SITUATION_ICONS[label]];
             return (
-              <div key={row} className="grid grid-cols-[330px_1fr_110px] items-center gap-8">
-                <span className="text-[28px] text-ink">loading {row.toLowerCase()}…</span>
-                <div className="h-[16px] rounded-full bg-bg border border-line overflow-hidden">
-                  <div className="h-full bg-accent rounded-full" style={{ width: `${fill * 100}%` }} />
-                </div>
-                <span className="text-[24px] text-accent text-right">{Math.round(fill * 100)}%</span>
+              <div
+                key={label}
+                className="bg-bg-card border border-line rounded-[16px] px-6 py-5 flex items-center gap-4"
+              >
+                {Icon && <Icon className="w-[38px] h-[38px] text-accent shrink-0" />}
+                <span className="text-[25px] font-semibold text-ink">{label}</span>
               </div>
             );
           })}
         </div>
+        <div className="text-center text-[36px] text-accent font-bold leading-none" aria-hidden>
+          ↓
+        </div>
+        <div className="border-2 border-accent/50 bg-accent/10 rounded-[18px] px-10 py-6 flex items-center justify-center gap-7">
+          {steps.map((step, i) => (
+            <div key={step} className="flex items-center gap-7">
+              <span className="text-[28px] font-bold text-ink whitespace-nowrap">{step}</span>
+              {i < steps.length - 1 && (
+                <span className="text-[32px] text-accent font-bold" aria-hidden>
+                  →
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="text-center text-[36px] text-accent font-bold leading-none" aria-hidden>
+          ↓
+        </div>
+        <div className="grid grid-cols-4 gap-5">
+          {outputs.map((label) => (
+            <div
+              key={label}
+              className="bg-bg-card border border-line rounded-[16px] px-6 py-4 flex items-center gap-4"
+            >
+              <CheckDocGlyph className="w-[30px] h-[30px] text-ink-muted shrink-0" />
+              <span className="text-[23px] text-ink-muted">{label}</span>
+            </div>
+          ))}
+        </div>
       </div>
       {content.body && (
-        <p className="text-[30px] text-ink-muted leading-[1.5] max-w-[1400px] shrink-0">{content.body}</p>
+        <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>
       )}
     </SlideFrame>
   );
 }
 
-// Recognition grid: icon tiles, one operator task each. Bullets are
-// "iconKey: label"; an unknown or missing icon key degrades to a label-only
-// tile — never crashes live. 3×2 up to six tiles, 4×2 beyond.
-function GridSlide({ content }: { content: SlideContent }) {
-  const tiles = (content.bullets ?? []).map(splitBullet);
-  const fourCol = tiles.length > 6;
+// Iceberg layers: visible artifacts above a dashed waterline, the reusable
+// judgment below it.
+function LayersSlide({ content }: { content: SlideContent }) {
+  const items = (content.bullets ?? []).map(splitBullet);
+  const visible = items.filter((i) => i.key === "visible").map((i) => i.text);
+  const hidden = items.filter((i) => i.key === "hidden").map((i) => i.text);
 
   return (
     <SlideFrame eyebrow={content.eyebrow}>
-      <h2 className="text-[62px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance max-w-[1400px] shrink-0">
+      <h2 className="text-[56px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
         {content.title}
       </h2>
-      <div
-        className={`flex-1 min-h-0 grid grid-rows-2 gap-6 mt-12 ${fourCol ? "grid-cols-4" : "grid-cols-3"}`}
-      >
-        {tiles.map(({ key, text }) => {
-          const Icon = TASK_ICONS[key];
-          return (
-            <div
-              key={text}
-              className={`bg-bg-card border border-line rounded-[24px] flex flex-col justify-between ${
-                fourCol ? "p-8" : "p-10"
-              }`}
+      <div className="flex-1 min-h-0 flex flex-col justify-center">
+        <div className="text-[16px] uppercase tracking-[0.12em] text-ink-muted mb-4">Visible</div>
+        <div className="flex flex-wrap gap-4">
+          {visible.map((label) => (
+            <span
+              key={label}
+              className="px-8 py-4 rounded-full border border-line bg-bg-card text-[27px] text-ink"
             >
-              {Icon && (
-                <Icon className={`text-accent shrink-0 ${fourCol ? "w-[58px] h-[58px]" : "w-[84px] h-[84px]"}`} />
-              )}
-              <p
-                className={`font-semibold leading-[1.3] text-ink text-balance ${
-                  fourCol ? "text-[26px]" : "text-[34px]"
+              {label}
+            </span>
+          ))}
+        </div>
+        <div className="border-t-2 border-dashed border-accent/60 my-9" aria-hidden />
+        <div className="text-[16px] uppercase tracking-[0.12em] text-accent mb-4">The reusable part</div>
+        <div className="flex flex-wrap gap-4 max-w-[1400px]">
+          {hidden.map((label) => (
+            <span
+              key={label}
+              className="px-8 py-4 rounded-full border border-accent/40 bg-accent/10 text-[27px] text-ink"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+      {content.body && (
+        <p className="text-[28px] text-ink-muted leading-[1.5] mt-4 shrink-0">{content.body}</p>
+      )}
+    </SlideFrame>
+  );
+}
+
+// The Repeat Test: three checklist questions plus a worked example table.
+// Bullets: "q: …" questions, "row: Task | Standards | First draft" rows.
+const TEST_TABLE_HEADERS = ["Task", "Repeated standards", "Useful first draft"];
+
+function TestSlide({ content }: { content: SlideContent }) {
+  const items = (content.bullets ?? []).map(splitBullet);
+  const questions = items.filter((i) => i.key === "q").map((i) => i.text);
+  const rows = items
+    .filter((i) => i.key === "row")
+    .map((i) => i.text.split("|").map((cell) => cell.trim()));
+
+  return (
+    <SlideFrame eyebrow={content.eyebrow}>
+      <h2 className="text-[56px] font-bold tracking-[-0.03em] leading-[1.08] text-ink text-balance shrink-0">
+        {content.title}
+      </h2>
+      <div className="flex-1 min-h-0 flex flex-col justify-center gap-10">
+        <div className="flex flex-col gap-5">
+          {questions.map((question, i) => (
+            <div key={question} className="flex items-center gap-6">
+              <span className="text-[30px] font-bold text-accent shrink-0">{i + 1}.</span>
+              <span className="text-[31px] font-semibold text-ink">{question}</span>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-[1.1fr_1.9fr_1fr] max-w-[1500px]">
+          {TEST_TABLE_HEADERS.map((header) => (
+            <div
+              key={header}
+              className="text-[17px] uppercase tracking-[0.1em] text-accent font-bold pb-3 border-b-2 border-line"
+            >
+              {header}
+            </div>
+          ))}
+          {rows.flatMap((cells, r) =>
+            cells.map((cell, c) => (
+              <div
+                key={`${r}-${c}`}
+                className={`py-4 pr-8 border-b border-line text-[23px] leading-[1.3] ${
+                  c === 0 ? "font-semibold text-ink" : "text-ink-muted"
                 }`}
               >
-                {text}
-              </p>
-            </div>
-          );
-        })}
+                {cell}
+              </div>
+            )),
+          )}
+        </div>
       </div>
+      {content.body && (
+        <p className="text-[28px] text-ink-muted leading-[1.5] mt-2 shrink-0">{content.body}</p>
+      )}
     </SlideFrame>
   );
 }
@@ -704,12 +752,12 @@ function renderSlideContent(content: SlideContent): ReactNode {
   switch (content.kind) {
     case "title":
       return <TitleSlide content={content} />;
-    case "orbit":
-      return <OrbitSlide content={content} />;
-    case "loading":
-      return <LoadingSlide content={content} />;
-    case "grid":
-      return <GridSlide content={content} />;
+    case "pattern":
+      return <PatternSlide content={content} />;
+    case "layers":
+      return <LayersSlide content={content} />;
+    case "test":
+      return <TestSlide content={content} />;
     case "matrix":
       return <MatrixSlide content={content} />;
     case "folder":
