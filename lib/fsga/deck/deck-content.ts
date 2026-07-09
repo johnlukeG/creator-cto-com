@@ -63,7 +63,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "pattern",
     eyebrow: "act one · the pattern",
     title: "Same shape. New details.",
-    body: "Different situation. Same shape underneath.",
     // "group: label" — situation cards flow through one shared pipeline into
     // outputs. Situation icons resolve by label in slides.tsx.
     bullets: [
@@ -88,7 +87,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "layers",
     eyebrow: "act one · the hidden work",
     title: "The part you keep rebuilding",
-    body: "The output is visible. The judgment behind it is the reusable part.",
     // "layer: label" — visible artifacts above the waterline, judgment below.
     bullets: [
       "visible: email",
@@ -113,7 +111,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "test",
     eyebrow: "act one · spot the opportunity",
     title: "The Repeat Test",
-    body: "If the standards repeat, it may be a Skill.",
     // "q: question" checklist, then "row: Task | Repeated standards | Useful
     // first draft" example table rows.
     bullets: [
@@ -135,7 +132,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "matrix",
     eyebrow: "act two · the metaphor",
     title: "Load the know-how",
-    body: "In The Matrix, Trinity needs to fly a helicopter. The system loads the capability the moment she needs it.",
     notes:
       "You all know this scene. [Click play — 36 seconds, audio up. Let 'Tank, I need a pilot program' land, cut after the takeoff if pressed.] Trinity needs to fly a helicopter, and the system loads the capability the moment she needs it. Most of us get the idea immediately — a task shows up, you need a capability, the right know-how gets loaded. AI Skills are the grounded version of that. You're not downloading kung fu; you're packaging instructions, context, standards, and examples so the AI can reuse them. [Click somewhere off the video before using arrow keys.] Now let's bring that back down to Monday-morning work.",
   },
@@ -146,7 +142,6 @@ export const DECK_SLIDES: SlideContent[] = [
     eyebrow: "act two · definition",
     title: "What an AI Skill is",
     big: "An AI Skill is reusable know-how for a specific kind of task.",
-    body: "It packages what an AI assistant needs to help with that task again.",
     bullets: ["workflow", "context", "examples", "standards", "files", "output format"],
     notes:
       "Here's the definition, and the important word is reusable. A Skill packages the workflow, the context, the examples, the files, and the standards an AI assistant needs to help with one kind of task — so it starts with more context next time instead of from zero. And this is provider-neutral: the pattern applies in ChatGPT, Claude, Claude Code, Cursor, or your own internal tooling, even if each platform implements it a little differently.",
@@ -157,7 +152,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "compare",
     eyebrow: "act two · distinction",
     title: "A prompt asks once. A Skill teaches the work.",
-    body: "When the same task keeps coming back, the guidance should come back with it.",
     bullets: [
       "Prompt: Written in the moment",
       "Prompt: Lives inside one conversation",
@@ -179,7 +173,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "playbook",
     eyebrow: "act three · the model",
     title: "Same playbook. New situation.",
-    body: "A Skill helps the AI handle a familiar kind of work with new information each time.",
     bullets: [
       "Input: What changed this time?",
       "Process: What the AI knows how to do",
@@ -194,7 +187,6 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "teardown",
     eyebrow: "act three · example",
     title: "One Skill, all the way through",
-    body: "The Newsletter Draft Assistant — the Input, Process, Output shape, filled in for real.",
     notes:
       "Let's open one all the way up: the Newsletter Draft Assistant. [Walk the pipeline left to right.] The repeated work: turning scattered links, notes, and takes into a clear email for your audience. The Input: your raw ingredients, your format, your voice. The Process: find the angle, match the voice, structure the draft, flag what still needs human judgment. The Output: a sendable draft with subject lines and review notes. This is not handing your voice to AI — the Skill gives the AI your standards before it starts writing, and you still make the final call. It just gets you a much stronger first draft.",
   },
@@ -206,7 +198,7 @@ export const DECK_SLIDES: SlideContent[] = [
     kind: "qr",
     eyebrow: "act four · your pack",
     title: "We built one for you",
-    body: "Scan the code. Find your name. You'll see a starter pack based on your role and likely repeated work.",
+    body: "A starter pack based on your role and your likely repeated work.",
     bullets: ["Scan", "Find your name", "Open your Skill Pack"],
     notes:
       "I wanted this to be concrete, so before today we built starter packs for people in this room. Pull out your phone: scan, find your name, open your Skill Pack. [WAIT. Do not talk over it. Let the heads go down and come back up.] Your pack isn't meant to be perfect — it's meant to give you a first rep, matched to your role and the work you probably repeat. [Optional live beat: pull up one attendee's pack on screen and walk it briefly.]",
