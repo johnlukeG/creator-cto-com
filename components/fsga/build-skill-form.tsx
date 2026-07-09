@@ -38,13 +38,22 @@ export function BuildSkillForm({
 }) {
   const [form, setForm] = useState<BuildSkillFormState>(EMPTY_STATE);
 
-  // Prefill the repeated task from the scorecard's "Name it" hand-off
-  // (?task=…). After hydration only — the page is prerendered, so reading
-  // the URL during the first render would mismatch. Never clobbers typing.
+  // Prefill from a deep link (?task=&input=&output=&goal=) — the scorecard's
+  // "Name it" hand-off and the pack page's "Make this your Skill" CTA both use
+  // this. After hydration only; never clobbers what the attendee has typed.
   useEffect(() => {
-    const fromScorecard = new URLSearchParams(window.location.search).get("task");
-    if (!fromScorecard) return;
-    setForm((f) => (f.repeatedTask ? f : { ...f, repeatedTask: fromScorecard.slice(0, 300) }));
+    const params = new URLSearchParams(window.location.search);
+    const task = params.get("task");
+    const input = params.get("input");
+    const output = params.get("output");
+    const goal = params.get("goal");
+    if (!task && !input && !output && !goal) return;
+    setForm((f) => ({
+      repeatedTask: f.repeatedTask || (task ?? "").slice(0, 300),
+      inputType: f.inputType || (input ?? "").slice(0, 300),
+      outputType: f.outputType || (output ?? "").slice(0, 300),
+      successGoal: f.successGoal || (goal ?? "").slice(0, 300),
+    }));
   }, []);
 
   const hasAnyContent = Object.values(form).some((v) => v.trim().length > 0);
