@@ -1,5 +1,38 @@
 # T9 Runbook — Supabase + Vercel provisioning (user actions)
 
+## 0. STATIC-DATA MODE (CURRENT) — read this first
+
+The public personalization read-path currently runs **without Supabase**: the
+pack page, search API, and presenter deck read committed repo data instead of
+the DB. Everything below (Supabase provisioning, import/packs/approve cycle)
+is dormant until you revert.
+
+- **Data lives in** `lib/fsga/data/attendees.ts` (152 attendees, name/company/
+  title/role only — **no emails committed, ever**; repo is public) and
+  `lib/fsga/data/overrides.ts` (hand-tuned pack copy, item lists, and
+  `featuredForDemo` flags — this replaces the admin UI for curation).
+- **Packs are derived at build**: `lib/fsga/data/packs.ts` runs matchSkills()
+  + buildPackCopy() per attendee; every `/fsga/pack/[slug]` page is
+  prerendered (force-static + generateStaticParams). Edit an override → next
+  deploy picks it up.
+- **SLUGS ARE FROZEN.** They're baked into printed QR codes. Never regenerate
+  or edit a slug in attendees.ts. New attendee: append a row and mint only
+  that slug with `makePublicSlug()`.
+- **Gate:** `npm run fsga:check` (skill library + attendee/pack assertions,
+  incl. an email-leak tripwire). Run before every deploy.
+- **⚠ Leads form still 500s without a DB** (`/api/fsga/leads` is untouched and
+  DB-backed). Decide before the event: provision Supabase, or hide/stub the
+  signup form. The AI generate-skill endpoint is fine — it falls back to a
+  template without a DB.
+- **Dormant while in this mode:** fsga:seed / fsga:import / fsga:packs /
+  fsga:approve / fsga:warm, and the /fsga/admin UI.
+- **Revert to DB mode:** flip imports back to `@/lib/fsga/db/queries` in
+  `app/fsga/pack/[slug]/page.tsx` (restore `revalidate = 60`, drop
+  generateStaticParams) and `app/api/fsga/search/route.ts`; restore the
+  getFeaturedPacks load in `app/fsga/presenter/page.tsx`; then run the full
+  §1–4 cycle. Reuse the committed slugs when importing attendees — QR codes
+  depend on them.
+
 ## 1. Supabase project (once, ~5 min)
 1. Vercel dashboard → your creatorcto.com project → Storage/Integrations → add **Supabase** (creates project + injects POSTGRES_* env vars), OR create at supabase.com and copy connection strings manually.
 2. Ensure these env vars exist in Vercel (Production + Preview) and locally in `.env.local`:

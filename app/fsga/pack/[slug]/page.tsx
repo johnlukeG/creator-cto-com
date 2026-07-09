@@ -3,22 +3,27 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Section } from "@/components/section";
 import { PackView } from "@/components/fsga/pack-view";
-import { getPublicPackBySlug } from "@/lib/fsga/db/queries";
+import { getAllPackSlugs, getPublicPackBySlug } from "@/lib/fsga/data/packs";
 
-export const revalidate = 60;
+// Static-data mode: packs derive from committed repo data, so every attendee
+// page is prerendered at build time — zero runtime compute at the venue.
+// dynamicParams stays at its default (true) so an unknown slug still falls
+// through to notFound()'s SearchBox recovery page.
+export const dynamic = "force-static";
+
+export function generateStaticParams() {
+  return getAllPackSlugs().map((slug) => ({ slug }));
+}
 
 // Wrapped in React's request-scoped cache() so generateMetadata and the page
-// body share one DB round trip instead of two.
+// body share one lookup instead of two.
 const fetchPack = cache(async (slug: string) => {
-  // Deliberate trade-off: catching DB errors here means a failed ISR
-  // revalidation caches the "temporarily unavailable" card for revalidate
-  // seconds instead of serving the stale good page. Accepted for the event
-  // (cold-render UX beats a crash; warm script pre-populates cache). Revisit
-  // post-event.
+  // Static data can't fail the way the DB could, but the error branch stays
+  // so reverting to lib/fsga/db/queries is a pure import flip.
   try {
     return { pack: await getPublicPackBySlug(slug), error: false as const };
   } catch (err) {
-    console.error(`fsga pack page: DB error fetching slug "${slug}"`, err);
+    console.error(`fsga pack page: error fetching slug "${slug}"`, err);
     return { pack: null, error: true as const };
   }
 });

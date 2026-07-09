@@ -13,8 +13,9 @@
     "fsga:seed": "tsx --env-file=.env.local scripts/fsga/seed-fake.ts",
     "fsga:approve": "tsx --env-file=.env.local scripts/fsga/approve-packs.ts",
     "fsga:leads": "tsx --env-file=.env.local scripts/fsga/export-leads.ts",
-    "fsga:check": "tsx scripts/fsga/check-skill-library.ts",
-    "fsga:warm": "tsx scripts/fsga/warm-packs.ts"
+    "fsga:check": "tsx scripts/fsga/check-skill-library.ts && tsx scripts/fsga/check-attendees.ts",
+    "fsga:warm": "tsx scripts/fsga/warm-packs.ts",
+    "fsga:provision": "tsx --env-file=.env.local scripts/fsga/provision-supabase.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
