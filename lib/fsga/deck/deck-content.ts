@@ -1,271 +1,266 @@
-// FSGA workshop — deck content: 6-act slide copy + speaker notes.
+// FSGA workshop — deck content: 4-act, 14-slide copy + speaker notes.
+// Outline source: scratchpad-fsga-outline-2.md (2026-07-08 revision).
 //
-// Data-only module: no React, no side effects. Task 6 builds slide layouts
-// against these exact ids and kinds. Projected copy (title/big/body/bullets)
-// is terse and confident; `notes` is what JL SAYS out loud — a skimmable cue
-// card (notes render in a ~180px presenter strip), not prepared remarks.
-// Skill references use real slugs from lib/fsga/skills/library.ts. The QR
-// code + URL and the featured-pack cards render from code/data, not from
-// copy here.
+// Data-only module: no React, no side effects. Slide layouts are built
+// against these exact ids and kinds in slides.tsx. Projected copy
+// (title/big/body/bullets/visual) is terse and confident; `notes` is what
+// JL SAYS out loud — a skimmable cue card (notes render in a ~180px
+// presenter strip), not prepared remarks. Skill references use real slugs
+// from lib/fsga/skills/library.ts. The QR code + URL render from
+// code/config, not from copy here.
 
 import { getSkillBySlug } from "../skills/library";
 
 export type SlideKind =
   | "title"
-  | "statement"
-  | "list"
-  | "model"
-  | "framework"
-  | "qr"
-  | "packs"
+  | "pattern"
+  | "layers"
+  | "test"
+  | "matrix"
+  | "folder"
+  | "compare"
+  | "playbook"
   | "teardown"
-  | "exercise"
+  | "qr"
+  | "framework"
+  | "scorecard"
   | "sentence"
   | "close";
 
 export interface SlideContent {
   id: string; // kebab-case, unique
-  act: 1 | 2 | 3 | 4 | 5 | 6;
+  act: 1 | 2 | 3 | 4;
   kind: SlideKind;
-  eyebrow?: string; // small label above title, e.g. "act one · the problem"
-  title: string; // the big line (headline / kicker)
+  eyebrow?: string; // small label above title, e.g. "act one · repeated work"
+  title: string; // the big line (headline / kicker); also the presenter-strip label
   body?: string; // supporting sentence(s), max ~2
-  bullets?: string[]; // for list/framework/model slides, 3–6 items
-  big?: string; // single oversized statement (statement/sentence slides)
+  bullets?: string[]; // list/grid/compare/scorecard content; some kinds parse "key: text"
+  big?: string; // single oversized statement
+  visual?: string; // kind-specific visual copy (orbit centerpiece, close footer)
   notes: string; // speaker notes: what JL SAYS. 3–6 sentences, first person, include any timing/pacing cue
 }
 
-export const DECK_TITLE = "FSGA AI Skills Workshop";
+export const DECK_TITLE = "Your First AI Skill";
 
-// The Skill JL tears down live in act 4. Must exist in the library.
-export const TEARDOWN_SKILL_SLUG = "sales-call-prep";
+// The Skill JL tears down live in act 3. Must exist in the library.
+export const TEARDOWN_SKILL_SLUG = "newsletter-draft-assistant";
 
 export const DECK_SLIDES: SlideContent[] = [
-  // ── Act 1 — arrive → recognition ────────────────────────────────────────
+  // ── Act 1 — start with their work ────────────────────────────────────────
   {
     id: "title",
     act: 1,
     kind: "title",
     eyebrow: "FSGA Conference · Live Workshop",
-    title: "FSGA AI Skills Workshop",
-    body: "JL · Creator CTO. You'll leave with one AI Skill built for your actual job.",
+    title: "Your First AI Skill",
+    body: "We're going to find one repeated task from your real work and turn it into the start of a reusable AI Skill.",
     notes:
-      "Hey everyone, I'm JL, and I make videos about practical AI workflows as Creator CTO. Here's my promise up front: most AI talks leave you with a list of tools and a vague feeling you should be doing more. [Pause, scan the room.] This one leaves you with one Skill you can run on Monday, built around work you already do. So let me start with an uncomfortable question.",
+      "Hey everyone — I'm JL, Creator CTO, and here's the whole session in one sentence: we find one repeated task from your real work and turn it into the start of a reusable AI Skill. Quick show of hands before we get going: how familiar are you with AI Skills — never heard of them, heard the term, or already using them? [Toss the football to someone; get one answer out loud.] Calibrate act two off the hands: mostly blank faces, slow down on the definition; hands on 'already using,' lean into the scorecard and the packs.",
   },
   {
-    id: "pain-week",
+    id: "same-shape",
     act: 1,
-    kind: "statement",
-    eyebrow: "act one · the problem",
-    title: "The honest question",
-    big: "How much of your week is redoing work you've already done?",
-    body: "Not new work. The same recap, the same email, the same deck, rebuilt from scratch.",
-    notes:
-      "[Let the question hang. Do not fill the silence.] I'm not talking about the hard, creative work. I mean the sponsorship recap you rebuild every month, the prospect research you redo before every call, the newsletter you reassemble from the same show notes. Be honest with yourself: what's your number, a quarter of your week, half? Keep that number in your head, because in 30 minutes we start giving some of it back.",
-  },
-  {
-    id: "smart-people",
-    act: 1,
-    kind: "statement",
-    eyebrow: "act one · the problem",
-    title: "It's not a talent problem",
-    big: "Smart people, doing the same manual work, over and over.",
-    body: "The work isn't hard. It's just repetitive, and it never stops arriving.",
-    notes:
-      "The people in this room are sharp, and a huge chunk of your week still goes to work that doesn't need your brain, just your hours. [Slow down here.] That's not a talent problem; our industry runs in weekly cycles, so the repetition never lets up. I'm not saying the letters A-I yet. First I want you to feel how much of this you're carrying.",
-  },
-
-  // ── Act 2 — "he gets our work" ──────────────────────────────────────────
-  {
-    id: "your-work-sales",
-    act: 2,
-    kind: "list",
-    eyebrow: "act two · your work",
-    title: "If you're in sales or partnerships",
+    kind: "pattern",
+    eyebrow: "act one · the pattern",
+    title: "Same shape. New details.",
+    // "group: label" — situation cards flow through one shared pipeline into
+    // outputs. Situation icons resolve by label in slides.tsx.
     bullets: [
-      "Prospect research before every partnerships meeting",
-      "Sponsor fit and activation ideas, deal by deal",
-      "Rebuilding the sponsorship deck for each brand",
-      "Post-conference follow-ups, forty cards deep",
-      "The weekly pipeline summary leadership keeps asking for",
+      "situation: Sponsor call",
+      "situation: New hire",
+      "situation: Investor update",
+      "situation: Customer recap",
+      "step: Gather context",
+      "step: Apply judgment",
+      "step: Create the useful thing",
+      "output: Call prep",
+      "output: Interview brief",
+      "output: Update memo",
+      "output: Recap email",
     ],
     notes:
-      "I did my homework on this room, so let's make it specific. [Gesture down the list; name a real example someone told you at this event.] Prospect research before every first call, sponsor-fit scoring deal by deal, the deck rebuilt for the fifth brand this quarter. And the follow-up pile after an event exactly like this one, where warm leads go cold because you ran out of Tuesday. Raise a hand if the follow-up pile just hit a nerve. [Wait for hands.] Hold that thought.",
+      "The surface changes: one day it's a sponsor, the next a candidate, the next an investor. [Trace the flow top to bottom.] Underneath there's a familiar pattern — gather context, apply judgment, create the useful thing. Different names in, different documents out, same shape in the middle. That hidden shape is what we care about today.",
   },
   {
-    id: "your-work-content",
-    act: 2,
-    kind: "list",
-    eyebrow: "act two · your work",
-    title: "If you're in content or media",
+    id: "hidden-work",
+    act: 1,
+    kind: "layers",
+    eyebrow: "act one · the hidden work",
+    title: "The part you keep rebuilding",
+    // "layer: label" — visible artifacts above the waterline, judgment below.
     bullets: [
-      "Turning one podcast into a week of clips",
-      "The newsletter, rebuilt from the same show notes",
-      "Weekly reporting nobody enjoys assembling",
-      "Scheduling interviews and screening for the next hire",
-      "Meeting follow-ups that slip three days late",
+      "visible: email",
+      "visible: deck",
+      "visible: recap",
+      "visible: brief",
+      "visible: follow-up",
+      "hidden: audience",
+      "hidden: goal",
+      "hidden: context",
+      "hidden: standards",
+      "hidden: examples",
+      "hidden: tone",
+      "hidden: next step",
     ],
     notes:
-      "Content side, same tax. [Call out a real show or team from the room if you have one.] You record one great podcast, then burn the afternoon hunting clip moments for TikTok, Reels, and Shorts, then rebuild the newsletter from the same show notes. Stack resume screening and interview scheduling on top if you're hiring. Who here has an episode from last week that still isn't clipped? [Wait for the laugh.] None of this is your craft, it's the tax you pay to do your craft.",
+      "The email is visible. The deck is visible. The recap is visible. But the repeatable value sits underneath the waterline: who is this for, what matters here, what does good look like, what should happen next. [Point below the line.] That's the part you keep rebuilding from scratch every time — and that's exactly the stuff a good Skill can carry for you.",
+  },
+  {
+    id: "repeat-test",
+    act: 1,
+    kind: "test",
+    eyebrow: "act one · spot the opportunity",
+    title: "The Repeat Test",
+    // "q: question" checklist, then "row: Task | Repeated standards | Useful
+    // first draft" example table rows.
+    bullets: [
+      "q: Do I do this more than once?",
+      "q: Do I keep explaining the same standards?",
+      "q: Would a strong first draft save time?",
+      "row: Sponsor call prep | What we sell, who they are, smart questions | Call brief",
+      "row: Investor update | Metrics, tone, priorities | Update memo",
+      "row: Newsletter draft | Voice, audience, CTA | Email draft",
+    ],
+    notes:
+      "Here's the quick test. Do you do it more than once? Do you keep re-explaining what good looks like? Would a better first draft help, even with a human reviewing it? [Walk one table row end to end.] If it's yes, yes, yes — you've got a Skill candidate. [Toss the football:] what's one task in your world that passes this test? [Take one or two answers out loud.]",
   },
 
-  // ── Act 3 — learn ───────────────────────────────────────────────────────
+  // ── Act 2 — name the concept ─────────────────────────────────────────────
   {
-    id: "ai-vague",
-    act: 3,
-    kind: "statement",
-    eyebrow: "act three · the idea",
-    title: "Let's name the real gap",
-    big: "AI is interesting. But it still feels vague.",
-    body: "The gap isn't the tool. It's one-off prompts versus a reusable workflow.",
+    id: "load-knowhow",
+    act: 2,
+    kind: "matrix",
+    eyebrow: "act two · the metaphor",
+    title: "Load the know-how",
     notes:
-      "Okay, now we can say it: AI. [Pause.] Most of you have poked at ChatGPT and it still feels vague, like everyone else got a memo you missed. Here's the truth: the gap isn't the tool, and it isn't your intelligence. Most people use AI as a one-off, so they start from scratch every single time. The people getting real leverage aren't smarter than you; they just stopped starting over.",
+      "You all know this scene. [Click play — 36 seconds, audio up. Let 'Tank, I need a pilot program' land, cut after the takeoff if pressed.] Trinity needs to fly a helicopter, and the system loads the capability the moment she needs it. Most of us get the idea immediately — a task shows up, you need a capability, the right know-how gets loaded. AI Skills are the grounded version of that. You're not downloading kung fu; you're packaging instructions, context, standards, and examples so the AI can reuse them. [Click somewhere off the video before using arrow keys.] Now let's bring that back down to Monday-morning work.",
   },
   {
     id: "skill-definition",
-    act: 3,
-    kind: "statement",
-    eyebrow: "act three · the idea",
-    title: "This is the whole talk",
-    big: "An AI Skill is a reusable workflow. Not a one-off prompt.",
-    body: "A one-off prompt, you retype every time. A Skill you write once, then run forever.",
+    act: 2,
+    kind: "folder",
+    eyebrow: "act two · definition",
+    title: "What an AI Skill is",
+    big: "An AI Skill is reusable know-how for a specific kind of task.",
+    bullets: ["workflow", "context", "examples", "standards", "files", "output format"],
     notes:
-      "If you take one sentence home, take this one. [Let it land. Don't rush off it.] A one-off prompt is you at 11pm re-explaining your whole situation from scratch, again. A Skill is that instruction written down once, so next week you just drop in new inputs and run it. It's your sponsorship recap: you don't redesign the deck every month, you fill in the new numbers. A Skill is that, for anything you repeat.",
+      "Here's the definition, and the important word is reusable. A Skill packages the workflow, the context, the examples, the files, and the standards an AI assistant needs to help with one kind of task — so it starts with more context next time instead of from zero. And this is provider-neutral: the pattern applies in ChatGPT, Claude, Claude Code, Cursor, or your own internal tooling, even if each platform implements it a little differently.",
   },
   {
-    id: "skill-model",
-    act: 3,
-    kind: "model",
-    eyebrow: "act three · the model",
-    title: "Every Skill has the same shape",
-    body: "If you can describe it to a new teammate, you can build it as a Skill.",
+    id: "prompt-vs-skill",
+    act: 2,
+    kind: "compare",
+    eyebrow: "act two · distinction",
+    title: "A prompt asks once. A Skill teaches the work.",
     bullets: [
-      "Input: the raw material you paste in",
-      "Process: the steps, spelled out once",
-      "Output: the finished thing you needed",
+      "Prompt: Written in the moment",
+      "Prompt: Lives inside one conversation",
+      "Prompt: Good for quick, one-off help",
+      "Prompt: You provide the context again next time",
+      "Skill: Created once and reused",
+      "Skill: Carries the task instructions",
+      "Skill: Includes examples, files, standards, and workflow steps",
+      "Skill: Helps the AI behave like a specialist for that task",
     ],
     notes:
-      "Every Skill has the same three-part shape: input, process, output. [Point to each as you say it.] Input is what you'd hand a new hire, like the show notes or the messy transcript. Process is what you'd tell them to do with it, the steps you already run in your head. Output is the finished thing, the clip list or the call plan. If you can explain a task to someone on their first day, you can build it as a Skill; you're describing your work, not learning to code.",
-  },
-  {
-    id: "skill-spotting",
-    act: 3,
-    kind: "framework",
-    eyebrow: "act three · the test",
-    title: "How to spot a good first Skill",
-    bullets: [
-      "You repeat it often",
-      "It's annoying enough to matter",
-      "You can describe the steps",
-      "It's low-risk enough to test",
-      "Useful even when it's only 70% right",
-    ],
-    notes:
-      "Five quick tests for your first Skill. [Count them on your fingers.] One, you do it often, weekly beats yearly. Two, it's annoying enough that automating it buys back real time. Three, you can describe the steps, because if you can't explain it, the AI can't either. Four, it's low-risk, an internal recap, not a legal filing. Five, it's still useful at seventy percent, because you're the editor, not the intern.",
+      "To be clear, prompts are still useful — the question is how many times you want to explain the same work. [Walk the two columns.] A prompt is written in the moment and lives inside one conversation; next time, you provide all the context again. A Skill is created once and carries the instructions, examples, standards, and workflow steps with it. Simple rule: if the task is a one-off, prompt it. If it keeps coming back, skill it.",
   },
 
-  // ── Act 4 — see ─────────────────────────────────────────────────────────
+  // ── Act 3 — show the shape ───────────────────────────────────────────────
+  {
+    id: "playbook",
+    act: 3,
+    kind: "playbook",
+    eyebrow: "act three · the model",
+    title: "Same playbook. New situation.",
+    bullets: [
+      "Input: What changed this time?",
+      "Process: What the AI knows how to do",
+      "Output: What it should produce",
+    ],
+    notes:
+      "This room knows playbooks, so here's the model. [Point at the football row.] Same playbook — new down, distance, defense, and field position — different result. Skills work exactly like that: same Skill, new notes, audience, goal, and context — different finished output. The input changes every time, the process stays reusable, and the output is specific to this situation. The Skill isn't the final answer; it's the reusable know-how that produces the next answer.",
+  },
+  {
+    id: "teardown",
+    act: 3,
+    kind: "teardown",
+    eyebrow: "act three · example",
+    title: "One Skill, all the way through",
+    notes:
+      "Let's open one all the way up: the Newsletter Draft Assistant. [Walk the pipeline left to right.] The repeated work: turning scattered links, notes, and takes into a clear email for your audience. The Input: your raw ingredients, your format, your voice. The Process: find the angle, match the voice, structure the draft, flag what still needs human judgment. The Output: a sendable draft with subject lines and review notes. This is not handing your voice to AI — the Skill gives the AI your standards before it starts writing, and you still make the final call. It just gets you a much stronger first draft.",
+  },
+
+  // ── Act 4 — make it theirs ───────────────────────────────────────────────
   {
     id: "qr-reveal",
     act: 4,
     kind: "qr",
-    eyebrow: "act four · the proof",
+    eyebrow: "act four · your pack",
     title: "We built one for you",
-    body: "Scan the code. Find your name. That's your personalized Skill Pack.",
+    body: "A starter pack based on your role and your likely repeated work.",
+    bullets: ["Scan", "Find your name", "Open your Skill Pack"],
     notes:
-      "[Slow way down. This is the moment.] Before today, we took the attendee list for this room and built a personalized AI Skill Pack for as many of you as we could. Pull out your phone and scan that code right now. [WAIT. Do not talk over it. Let the heads go down and come back up.] Find your name and take ten seconds with it. [Ride the first 'oh, that's me.'] That 'wait, this is for me' feeling is what a Skill does: it takes something generic and makes it yours.",
+      "I wanted this to be concrete, so before today we built starter packs for people in this room. Pull out your phone: scan, find your name, open your Skill Pack. [WAIT. Do not talk over it. Let the heads go down and come back up.] Your pack isn't meant to be perfect — it's meant to give you a first rep, matched to your role and the work you probably repeat. [Optional live beat: pull up one attendee's pack on screen and walk it briefly.]",
   },
   {
-    id: "featured-packs",
+    id: "good-first-skill",
     act: 4,
-    kind: "packs",
-    eyebrow: "act four · the proof",
-    title: "People in this room",
-    body: "Real roles, real first Skills. Yours works exactly the same way.",
+    kind: "framework",
+    eyebrow: "act four · choosing well",
+    title: "What makes a good first Skill?",
+    bullets: [
+      "You repeat it often",
+      "It has a clear input",
+      "You know what a good output looks like",
+      "The steps can be explained",
+      "It's useful even before it's perfect",
+    ],
     notes:
-      "Here's a founder at a DFS operator, and her first Skill is a weekly decision brief, because her Fridays disappear into synthesis. [Point to the cards as you go.] Here's a partnerships lead at a media company, whose first Skill is prospect research before every call. These aren't random; each pack is matched to what that person actually does all week. The one on your phone was built the same way. Now let's open one all the way up.",
+      "So which task should you pick? The first Skill should be boring in the best way: something real, repeated, and easy to test. [Count the checks on your fingers.] You repeat it often, it has a clear input, you know what good output looks like, you can explain the steps, and it's useful before it's perfect. Here's a question for the room: what's a task you would never fully automate, but would love a better first draft of? [Toss the football; take an answer.]",
   },
   {
-    id: "teardown",
+    id: "scorecard",
     act: 4,
-    kind: "teardown",
-    eyebrow: "act four · inside a Skill",
-    title: "One Skill, all the way through",
-    body: "Sales Call Prep. Watch the Input, Process, Output shape show up for real.",
+    kind: "scorecard",
+    eyebrow: "act four · first rep",
+    title: "Should this become a Skill?",
+    // Dimensions, hint copy, and verdict logic live in lib/fsga/scorecard.ts —
+    // shared with the interactive scorecard on the attendee pack page.
     notes:
-      "This is Sales Call Prep, one of the most-picked Skills in the room, so let's tear it down. [Walk the card top to bottom.] The repeated work: improvising discovery questions and value points on every single call. The Input: the prospect, what you sell, and your notes so far. The Process: name the outcome you want, draft the discovery questions, phrase value as benefits, propose a clean next step. The Output: a one-page call plan you can glance at mid-call. The Result: you stop winging it, and every rep runs the same sharp play.",
-  },
-
-  // ── Act 5 — do ──────────────────────────────────────────────────────────
-  {
-    id: "exercise",
-    act: 5,
-    kind: "exercise",
-    eyebrow: "act five · your turn",
-    title: "Write down one task you do more than twice a month.",
-    body: "Pen, phone, napkin. Whatever's closest. Just get one real task down.",
-    notes:
-      "Write down one task, on your phone or a napkin, that you do more than twice a month and are a little sick of. Not the perfect one, the first real one that popped into your head. [Give them a true 60 seconds. Do NOT rescue the silence at 15 seconds; that's exactly when they start thinking.] I'll wait right here. [At 60:] Got one? Hold onto it, because we're about to turn it into a sentence.",
+      "Now do this for real: pick one repeated task from your work and answer these six questions — plain answers, no scale to overthink. This same scorecard is on your pack page, under your Skills — do yours on your phone right now while I run one up here. [Take the football volunteer's task and click it through live; let the meter climb and the verdict land. Give the room a real minute; don't rescue the silence.] If the bell rings, that's your first rep. The best first Skill is usually not the flashiest one — it's the task where you keep reloading the same context and standards.",
   },
   {
-    id: "sentence",
-    act: 5,
+    id: "name-the-skill",
+    act: 4,
     kind: "sentence",
-    eyebrow: "act five · your turn",
-    title: "Turn it into one sentence",
-    big: "My first Skill should help me turn ___ into ___ so that ___.",
-    body: "Fill it in for real at creatorcto.com/fsga/build-your-own.",
+    eyebrow: "act four · name it",
+    title: "Name the Skill",
+    big: "This Skill should help me turn [input] into [output] using [process, standards, examples].",
+    bullets: [
+      "Turn rough newsletter notes into a polished audience email using my voice, structure, and past examples.",
+      "Turn meeting notes into follow-ups using our standard next-step format.",
+      "Turn scattered updates into an investor recap using our usual tone, metrics, and priorities.",
+      "Turn candidate notes into an interview prep brief using the role requirements and hiring criteria.",
+    ],
     notes:
-      "Take that task and pour it into this sentence. [Read it slowly, then read it again.] For me it's: turn a podcast episode into ten clips, so that I stop losing my Thursday. The 'so that' is the part that matters; that's the time you're buying back. There's a form at slash build-your-own, on the page you scanned, that walks you through it. Fill it in before you leave and you've specced your first Skill.",
-  },
-
-  // ── Act 6 — leave ───────────────────────────────────────────────────────
-  {
-    id: "one-not-ten",
-    act: 6,
-    kind: "statement",
-    eyebrow: "act six · where to start",
-    title: "The only trap to avoid",
-    big: "Choose one workflow. Not ten.",
-    body: "Repeated, annoying, describable, low-risk, useful at 70%. Pick the one that passes cleanest.",
-    notes:
-      "One warning, because I've watched people faceplant right here. The mistake isn't starting too small; it's starting ten things at once and shipping none of them. [Get firm.] Run your candidate back through the five tests and pick whichever passes cleanest. Get one working and feel the hours come back. The next five get obvious on their own.",
-  },
-  {
-    id: "save-pack",
-    act: 6,
-    kind: "statement",
-    eyebrow: "act six · take it with you",
-    title: "Don't let this evaporate",
-    big: "Email yourself your pack and your worksheet.",
-    body: "There's a button on your pack page. One tap and it's in your inbox for Monday.",
-    notes:
-      "On your pack page there's a button to email yourself the whole thing, your Skills and the worksheet you just filled in. [Hold up your phone and mime the tap.] Do it right now, while you're thinking about it. Monday-morning you will be grateful. The pack doesn't expire; it'll be waiting when you're ready to build.",
-  },
-  {
-    id: "follow",
-    act: 6,
-    kind: "close",
-    eyebrow: "act six · keep going",
-    title: "Where to keep learning this",
-    body: "I make this stuff every week as Creator CTO. YouTube: @creator-cto.",
-    notes:
-      "If today clicked, this is what I do all week. I'm Creator CTO on YouTube, at creator dash c-t-o, breaking down exactly these AI workflows for people who aren't engineers. [Point to the handle on screen.] If you only ever use the one Skill from today, I'll still call it a win. But the door's open if you want more.",
+      "Last step: name it. One sentence — turn this input into that output, using your standards, your examples, your process. [Read two of the examples slowly.] Keep the first version simple: if the sentence tells you the input, the output, and the standards the AI needs, you've specced your first Skill. Before you leave, email yourself your pack and your worksheet — there's a button on your pack page. The goal is to leave with one thing you can try.",
   },
   {
     id: "thanks",
-    act: 6,
+    act: 4,
     kind: "close",
-    eyebrow: "act six · thank you",
+    eyebrow: "thank you",
     title: "Thank you. Now go build one.",
-    body: "Scan again if you missed it. Find your pack. I'll be right here after.",
+    body: "Scan again if you missed it. Find your pack. I'll be around after.",
+    visual: "Creator CTO · YouTube: @creator-cto",
     notes:
-      "[Warm, unhurried.] Thank you for your attention; it's the scarcest thing in this room. If you didn't grab your pack, the code is still up, so scan it now. Come find me after, because I want to hear the task you wrote down, and I'll help you sharpen it into a Skill on the spot. [Smile. Hold the moment.] Go build one, just one. See you out there.",
+      "[Warm, unhurried.] Thanks, everybody. If you didn't grab your pack, the code's still up — scan it now. If you want help spotting your first Skill, come find me after; I'll help you sharpen it on the spot. [Smile. Hold the moment.] Go build one.",
   },
 ];
 
 // Fail fast at import: the Skill JL tears down live must exist in the library.
-// A typo here would blow up the act-4 teardown slide in front of the room.
+// A typo here would blow up the act-3 teardown slide in front of the room.
 if (!getSkillBySlug(TEARDOWN_SKILL_SLUG)) {
   throw new Error(
     `lib/fsga/deck/deck-content.ts: TEARDOWN_SKILL_SLUG "${TEARDOWN_SKILL_SLUG}" not found in skill library`,
