@@ -15,8 +15,7 @@ export function PackHeader({
         {attendee.name}&rsquo;s AI Skill Pack
       </h1>
       <p className="text-[13px] text-ink-muted mt-2.5">
-        {attendee.title ? `${attendee.title} · ` : ""}
-        {attendee.company}
+        {[attendee.title, attendee.company].filter(Boolean).join(" · ")}
       </p>
       {customIntro && <p className="text-[14px] text-accent mt-4 leading-[1.6]">{customIntro}</p>}
       {summary && <p className="text-[13px] text-ink-muted mt-3 leading-[1.6]">{summary}</p>}

@@ -17,41 +17,11 @@ import { eq } from "drizzle-orm";
 import { pathToFileURL } from "node:url";
 import { attendees, skillPackItems, skillPacks, type PackStatus } from "../../lib/fsga/db/schema";
 import { matchSkills } from "../../lib/fsga/matching";
+import { buildPackCopy } from "../../lib/fsga/pack-copy";
 import type { CompanyType, RoleCategory } from "../../lib/fsga/skills/types";
 import { flag, runScript, scriptDb, type ScriptDb } from "./lib";
 
 const LOCKED_STATUSES: PackStatus[] = ["review_needed", "approved", "featured_for_demo"];
-
-const ROLE_LABELS: Record<RoleCategory, string> = {
-  "executive-founder": "founders and execs",
-  "sales-partnerships": "sales and partnerships leads",
-  "marketing-content": "marketing and content teams",
-  "product-ops": "product and ops leads",
-  "hiring-people": "hiring managers",
-  "analyst-research": "analysts and researchers",
-  other: "busy operators",
-};
-
-function firstName(name: string): string {
-  return name.trim().split(/\s+/)[0] || name;
-}
-
-function buildPackCopy(
-  attendee: { name: string; company: string; title: string | null },
-  roleCategory: RoleCategory,
-  skillCount: number,
-): { title: string; summary: string; rationale: string; customIntro: string } {
-  const first = firstName(attendee.name);
-  const roleLabel = ROLE_LABELS[roleCategory];
-  const titleAt = attendee.title ? `${attendee.title} at ${attendee.company}` : attendee.company;
-
-  return {
-    title: `${first}'s AI Skill Pack`,
-    summary: `A shortlist of ${skillCount} AI skills matched to ${roleLabel}, picked for ${first}'s work as ${titleAt}.`,
-    rationale: `These target the repeated, manual work that eats a week at ${attendee.company} — built to be useful today, not just interesting.`,
-    customIntro: `Welcome, ${first}! Based on your role at ${attendee.company}, here are the AI skills we think you'll reach for first.`,
-  };
-}
 
 /**
  * Generates (or fully regenerates) a single attendee's pack: upserts the
