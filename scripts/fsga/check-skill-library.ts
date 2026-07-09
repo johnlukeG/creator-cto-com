@@ -23,7 +23,7 @@ function nonEmptyArray(value: unknown): value is unknown[] {
   return Array.isArray(value) && value.length > 0;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   if (SKILLS.length !== 40) {
     fail(`expected exactly 40 skills, found ${SKILLS.length}`);
   }
@@ -56,10 +56,69 @@ function main(): void {
     }
   }
 
+  // Every companyType yields >= 5 matches, all slugs valid, and includes at
+  // least one company accent (proof companyType actually steers selection).
+  const { COMPANY_ACCENTS, UBIQUITOUS_CORE } = await import("../../lib/fsga/matching");
+  for (const [companyType, accents] of Object.entries(COMPANY_ACCENTS)) {
+    for (const accent of accents) {
+      if (!slugs.has(accent.slug)) fail(`COMPANY_ACCENTS["${companyType}"] references unknown slug: ${accent.slug}`);
+    }
+    const matches = matchSkills({ roleCategory: "other", companyType: companyType as never });
+    if (matches.length < 5) fail(`companyType "${companyType}" yields only ${matches.length} matches (need >= 5)`);
+    const accentSlugs = new Set(accents.map((a) => a.slug));
+    if (!matches.some((m) => accentSlugs.has(m.slug))) {
+      fail(`companyType "${companyType}" produced no accent skill — companyType not steering selection`);
+    }
+  }
+  // Ubiquitous core anchors every pack: a no-companyType call surfaces it.
+  for (const core of UBIQUITOUS_CORE) {
+    if (!slugs.has(core.slug)) fail(`UBIQUITOUS_CORE references unknown slug: ${core.slug}`);
+  }
+  const bareMatches = matchSkills({ roleCategory: "other", companyType: null });
+  const coreSlugs = new Set(UBIQUITOUS_CORE.map((c) => c.slug));
+  if (!bareMatches.every((m) => coreSlugs.has(m.slug))) {
+    fail("a no-companyType 'other' pack should be entirely ubiquitous-core skills");
+  }
+
+  // skill-export helpers: placeholder fill leaves no [ROLE]/[COMPANY] residue
+  // but preserves other [PASTE …] placeholders; SKILL.md is well-formed; the
+  // build-your-own link carries the four prefill params.
+  const exp = await import("../../lib/fsga/skill-export");
+  const sample = SKILLS.find((s) => s.starterPrompt.includes("[ROLE]") && s.starterPrompt.includes("[COMPANY]"));
+  if (!sample) fail("expected at least one library skill whose starterPrompt has [ROLE] and [COMPANY]");
+  const filled = exp.fillPlaceholders(sample!.starterPrompt, { role: "Founder", company: "Fantasy Cares" });
+  if (filled.includes("[ROLE]") || filled.includes("[COMPANY]")) fail("fillPlaceholders left [ROLE]/[COMPANY] residue");
+  if (!filled.includes("Fantasy Cares") || !filled.includes("Founder")) fail("fillPlaceholders did not inject role/company");
+  if (sample!.starterPrompt.includes("[PASTE") && !filled.includes("[PASTE")) fail("fillPlaceholders wrongly stripped a [PASTE …] placeholder");
+
+  const md = exp.compileSkillFile(sample!);
+  if (!md.startsWith("---\nname: ")) fail("compileSkillFile missing YAML frontmatter");
+  if (!md.includes("\n## Process\n") || !md.includes("\n## Starter prompt\n")) fail("compileSkillFile missing required sections");
+
+  const colonSkill = SKILLS.find((s) => s.description.includes(": "));
+  if (colonSkill) {
+    const colonMd = exp.compileSkillFile(colonSkill);
+    const descLine = colonMd.split("\n").find((l) => l.startsWith("description:"));
+    if (!descLine || !descLine.startsWith('description: "') || !descLine.endsWith('"')) {
+      fail(`compileSkillFile did not YAML-quote a colon-containing description: ${descLine}`);
+    }
+  }
+
+  const prompt = exp.compileSkillPrompt(sample!);
+  if (!prompt.includes(sample!.name) || prompt.trim() === "") fail("compileSkillPrompt produced empty/nameless output");
+
+  const q = exp.buildYourOwnQuery(sample!);
+  if (!q.startsWith("?") || !q.includes("task=") || !q.includes("input=") || !q.includes("output=") || !q.includes("goal=")) {
+    fail(`buildYourOwnQuery missing prefill params: ${q}`);
+  }
+
   console.log(
     `fsga:check OK — ${SKILLS.length} skills across ${SKILL_CATEGORIES.length} categories; ` +
       `all ${ROLE_CATEGORIES.length} role categories yield >= 5 matches; all rule-table slugs valid.`,
   );
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

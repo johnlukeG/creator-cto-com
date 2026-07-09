@@ -2,6 +2,7 @@
 
 import { Btn, Pill } from "@/components/atoms";
 import { LINKS } from "@/lib/content";
+import { buildYourOwnQuery, fillPlaceholders } from "@/lib/fsga/skill-export";
 import { getSkillBySlug } from "@/lib/fsga/skills/library";
 import type { Skill } from "@/lib/fsga/skills/types";
 import type { PublicPack, PublicPackItem } from "@/lib/fsga/db/queries";
@@ -11,15 +12,23 @@ import { ScorecardInteractive } from "./scorecard-interactive";
 import { SkillCard } from "./skill-card";
 
 export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: string }) {
+  const role = pack.attendee.title?.trim() || "my role";
+  const company = pack.attendee.company?.trim() || "my company";
+
   const resolved = pack.items
     .map((item): { item: PublicPackItem; skill: Skill } | null => {
-      const skill = getSkillBySlug(item.slug);
-      if (!skill) {
+      const base = getSkillBySlug(item.slug);
+      if (!base) {
         // Defensive: a stale/typo'd slug in skill_pack_items must never crash
         // the page for a live attendee — skip it and log for follow-up.
         console.error(`fsga pack-view: unknown skill slug "${item.slug}" — skipping`);
         return null;
       }
+      const skill: Skill = {
+        ...base,
+        name: item.signature?.name ?? base.name,
+        starterPrompt: fillPlaceholders(item.signature?.starterPrompt ?? base.starterPrompt, { role, company }),
+      };
       return { item, skill };
     })
     .filter((x): x is { item: PublicPackItem; skill: Skill } => x !== null);
@@ -28,6 +37,11 @@ export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: strin
     <div className="max-w-[680px] mx-auto">
       <PackHeader attendee={pack.attendee} customIntro={pack.pack.customIntro} summary={pack.pack.summary} />
 
+      <p className="text-[13px] text-ink-muted leading-[1.6] mb-6 -mt-3">
+        A starting point — not a prescription. Copy any of these into your own AI, or use the one below as the
+        seed for the Skill only you could build.
+      </p>
+
       <div className="grid gap-5">
         {resolved.map(({ item, skill }) => (
           <SkillCard
@@ -35,6 +49,7 @@ export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: strin
             skill={skill}
             customReason={item.customReason}
             recommendedFirst={item.recommendedFirst}
+            isSignature={Boolean(item.signature)}
             rank={item.rank}
           />
         ))}
@@ -57,13 +72,17 @@ export function PackView({ pack, packSlug }: { pack: PublicPack; packSlug: strin
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
-        <div className="bg-bg-card border border-line rounded-[18px] p-6 sm:p-7 flex flex-col items-start gap-3">
-          <div className="text-[10px] tracking-[0.08em] uppercase text-ink-faint">Keep going</div>
-          <p className="text-[14px] text-ink leading-[1.55]">
-            Have a workflow that&rsquo;s uniquely yours? Build a Skill around it.
+        <div className="bg-bg-card border border-accent rounded-[18px] p-6 sm:p-7 flex flex-col items-start gap-3">
+          <div className="text-[10px] tracking-[0.08em] uppercase text-ink-faint">Your move</div>
+          <p className="text-[15px] text-ink leading-[1.55] font-medium">
+            The best Skill is the one built around your work. Start from your top pick — the sentence is already
+            filled in.
           </p>
-          <Btn href="/fsga/build-your-own" variant="primary">
-            Build your own first Skill
+          <Btn
+            href={`/fsga/build-your-own${resolved[0] ? buildYourOwnQuery(resolved[0].skill) : ""}`}
+            variant="primary"
+          >
+            Build your own Skill
           </Btn>
         </div>
 

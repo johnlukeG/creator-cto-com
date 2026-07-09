@@ -19,7 +19,8 @@ interface RuleEntry {
   reason: string;
 }
 
-const MAX_MATCHES = 7;
+const MAX_MATCHES = 5;
+const MAX_ACCENTS = 2;
 
 // ── Base recommendations, keyed by RoleCategory ─────────────────────────────
 // Ordered lists: the first entry is the top recommendation for that role.
@@ -202,6 +203,68 @@ const ROLE_RULES: Record<RoleCategory, RuleEntry[]> = {
   ],
 };
 
+// ── Ubiquitous core ─────────────────────────────────────────────────────────
+// The backbone of every pack: skills nearly anyone benefits from, regardless
+// of role. These anchor the shortlist so the default pack is useful even when
+// role/company signal is thin. Reasons are hand-written and role-neutral.
+export const UBIQUITOUS_CORE: RuleEntry[] = [
+  {
+    slug: "meeting-notes-to-action-items",
+    reason: "Turns any meeting you just left into a clean list of who owns what — the highest-hit-rate skill for anyone with a calendar.",
+  },
+  {
+    slug: "inbox-triage-assistant",
+    reason: "Sorts a backlog of messages into act-now, delegate, and quick-reply so nothing important gets buried.",
+  },
+  {
+    slug: "daily-priority-planner",
+    reason: "Cuts an overflowing task list down to the 3 things that actually move the needle today.",
+  },
+  {
+    slug: "relationship-follow-up-reminder",
+    reason: "Surfaces the people you owe a reply or a check-in before the thread goes cold.",
+  },
+  {
+    slug: "reading-research-summarizer",
+    reason: "Gets the value out of a long report, thread, or doc without reading the whole thing.",
+  },
+];
+
+// ── Company accents ──────────────────────────────────────────────────────────
+// 1–3 slugs that fit what a company of this type actually does. Up to
+// MAX_ACCENTS are promoted ahead of the ubiquitous core so the pack still
+// reads "matched" without drowning in niche role skills. Reasons tied to the
+// company type, hand-written, never generated.
+export const COMPANY_ACCENTS: Record<CompanyType, RuleEntry[]> = {
+  "operator-platform": [
+    { slug: "customer-feedback-synthesizer", reason: "For a live platform, turns a flood of tickets and reviews into the themes and quick wins your roadmap needs." },
+    { slug: "product-launch-checklist-builder", reason: "Builds the phased launch checklist that catches easy-to-forget items before a release ships." },
+  ],
+  "media-content": [
+    { slug: "episode-to-clips-planner", reason: "Finds the clip-worthy moments so repurposing long-form into short-form stops eating an afternoon." },
+    { slug: "social-post-variant-generator", reason: "Adapts one announcement into platform-native posts instead of the same caption pasted everywhere." },
+  ],
+  "team-league": [
+    { slug: "competitor-movement-summary", reason: "Turns a pile of league/market signals into the one-page read on what actually changed." },
+    { slug: "strategic-memo-builder", reason: "Structures a hard call into a memo you can align stakeholders around." },
+  ],
+  "brand-sponsor": [
+    { slug: "sponsorship-fit-scorer", reason: "Scores partnership fit against a consistent rubric instead of eyeballing every deal." },
+    { slug: "campaign-brief-builder", reason: "Gets everyone aligned on one campaign brief instead of re-litigating the message at kickoff." },
+  ],
+  "agency-services": [
+    { slug: "proposal-outline-builder", reason: "Turns a discovery call into a structured proposal outline you can send the same day." },
+    { slug: "prospect-research-brief", reason: "Builds the one-page client brief you need before every first call, from a name and a few signals." },
+  ],
+  "data-technology": [
+    { slug: "tool-evaluation-brief", reason: "Compares options against what actually matters to your team, not just popularity." },
+    { slug: "reading-research-summarizer", reason: "Distills a long technical report into the takeaways that matter for your specific angle." },
+  ],
+  other: [
+    { slug: "post-conference-follow-up-planner", reason: "Turns the contacts you just collected into follow-ups before the leads go cold." },
+  ],
+};
+
 // ── Pain adjustment ──────────────────────────────────────────────────────────
 // A small pain→slug map. When an attendee self-reports a workflow pain, its
 // matching slugs are promoted into the recommendation list (ranked above the
@@ -299,6 +362,14 @@ function assertRuleSlugsExist(): void {
       if (!getSkillBySlug(entry.slug)) missing.push(entry.slug);
     }
   }
+  for (const entry of UBIQUITOUS_CORE) {
+    if (!getSkillBySlug(entry.slug)) missing.push(entry.slug);
+  }
+  for (const entries of Object.values(COMPANY_ACCENTS)) {
+    for (const entry of entries) {
+      if (!getSkillBySlug(entry.slug)) missing.push(entry.slug);
+    }
+  }
   if (missing.length > 0) {
     throw new Error(
       `lib/fsga/matching.ts: rule table references unknown skill slug(s): ${[...new Set(missing)].join(", ")}`,
@@ -315,24 +386,24 @@ export interface MatchSkillsInput {
 }
 
 export function matchSkills(input: MatchSkillsInput): SkillMatch[] {
-  const base = ROLE_RULES[input.roleCategory];
   const painEntries = input.pain ? (PAIN_RULES[input.pain] ?? []) : [];
+  const accentEntries = input.companyType ? (COMPANY_ACCENTS[input.companyType] ?? []).slice(0, MAX_ACCENTS) : [];
+  const roleEntries = ROLE_RULES[input.roleCategory] ?? [];
 
   const seen = new Set<string>();
   const ordered: RuleEntry[] = [];
+  const push = (entries: RuleEntry[]) => {
+    for (const entry of entries) {
+      if (seen.has(entry.slug)) continue;
+      seen.add(entry.slug);
+      ordered.push(entry);
+    }
+  };
 
-  // Pain-matched slugs are promoted to the front of the list, in pain-map order.
-  for (const entry of painEntries) {
-    if (seen.has(entry.slug)) continue;
-    seen.add(entry.slug);
-    ordered.push(entry);
-  }
-  // Then the role's own base recommendations, in rank order, skipping dupes.
-  for (const entry of base) {
-    if (seen.has(entry.slug)) continue;
-    seen.add(entry.slug);
-    ordered.push(entry);
-  }
+  push(painEntries);       // self-reported pain wins the top slot(s)
+  push(accentEntries);     // company-fit accents make it read "matched"
+  push(UBIQUITOUS_CORE);   // the universally-useful backbone
+  push(roleEntries);       // role rules only backfill if still short
 
   return ordered.slice(0, MAX_MATCHES).map((entry, index) => ({
     slug: entry.slug,

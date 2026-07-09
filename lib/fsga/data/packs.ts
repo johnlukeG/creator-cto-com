@@ -58,6 +58,35 @@ function buildPacks(): Map<string, PublicPack> {
       if (!getSkillBySlug(item.slug)) problems.push(`${a.slug}: unknown skill slug "${item.slug}"`);
     }
 
+    // Curated signature hero: reuse a real library skill's guts, brand its
+    // name + reason + (optional) prompt, and prepend it at rank 1. Dedupe its
+    // base slug out of the matched tail so it never appears twice.
+    if (override?.hero) {
+      const base = getSkillBySlug(override.hero.baseSkillSlug);
+      if (!base) {
+        problems.push(`${a.slug}: hero references unknown base skill "${override.hero.baseSkillSlug}"`);
+      } else {
+        const tail = items
+          .filter((it) => it.slug !== override.hero!.baseSkillSlug)
+          .map((it, i) => ({ ...it, rank: i + 2, recommendedFirst: false }));
+        items.length = 0;
+        items.push(
+          {
+            slug: base.slug,
+            rank: 1,
+            customReason: override.hero.customReason,
+            customExample: null,
+            recommendedFirst: true,
+            signature: {
+              name: override.hero.name,
+              starterPrompt: override.hero.starterPrompt ?? base.starterPrompt,
+            },
+          },
+          ...tail,
+        );
+      }
+    }
+
     const copy = buildPackCopy(attendee, a.roleCategory, items.length);
 
     packs.set(a.slug, {
