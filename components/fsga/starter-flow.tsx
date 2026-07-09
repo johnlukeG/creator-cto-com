@@ -11,6 +11,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { matchSkills } from "@/lib/fsga/matching";
 import { getSkillBySlug } from "@/lib/fsga/skills/library";
+import { fillPlaceholders } from "@/lib/fsga/skill-export";
 import {
   COMPANY_TYPES,
   ROLE_CATEGORIES,
@@ -146,8 +147,16 @@ export function StarterFlow() {
     const matches = matchSkills({ roleCategory: role, companyType: company, pain });
     const items = matches
       .map((match) => {
-        const skill = getSkillBySlug(match.slug);
-        return skill ? { match, skill } : null;
+        const base = getSkillBySlug(match.slug);
+        if (!base) return null;
+        const skill: Skill = {
+          ...base,
+          starterPrompt: fillPlaceholders(base.starterPrompt, {
+            role: ROLE_LABELS[role],
+            company: company ? COMPANY_LABELS[company] : "my company",
+          }),
+        };
+        return { match, skill };
       })
       .filter((x): x is { match: (typeof matches)[number]; skill: Skill } => x !== null);
 

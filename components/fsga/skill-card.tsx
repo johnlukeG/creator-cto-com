@@ -1,9 +1,10 @@
 // FSGA workshop — canonical Skill teaching card.
 //
-// SERVER-compatible: no hooks in this file. The only interactive bit (copy
-// button) is delegated to the CopyButton client component so this card can
-// be rendered both from server pages (pack view) and, later, embedded inside
-// presentation slides (Task 6) without extra client-boundary ceremony.
+// SERVER-compatible: no hooks in this file. The interactive bits (copy
+// prompt, download Skill .md, build-your-own link) are delegated to the
+// SkillActions client component so this card can be rendered both from
+// server pages (pack view) and, later, embedded inside presentation slides
+// (Task 6) without extra client-boundary ceremony.
 
 import { Pill } from "@/components/atoms";
 import type { ReactNode } from "react";
