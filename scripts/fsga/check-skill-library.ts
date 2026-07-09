@@ -23,7 +23,7 @@ function nonEmptyArray(value: unknown): value is unknown[] {
   return Array.isArray(value) && value.length > 0;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   if (SKILLS.length !== 40) {
     fail(`expected exactly 40 skills, found ${SKILLS.length}`);
   }
@@ -56,10 +56,37 @@ function main(): void {
     }
   }
 
+  // Every companyType yields >= 5 matches, all slugs valid, and includes at
+  // least one company accent (proof companyType actually steers selection).
+  const { COMPANY_ACCENTS, UBIQUITOUS_CORE } = await import("../../lib/fsga/matching");
+  for (const [companyType, accents] of Object.entries(COMPANY_ACCENTS)) {
+    for (const accent of accents) {
+      if (!slugs.has(accent.slug)) fail(`COMPANY_ACCENTS["${companyType}"] references unknown slug: ${accent.slug}`);
+    }
+    const matches = matchSkills({ roleCategory: "other", companyType: companyType as never });
+    if (matches.length < 5) fail(`companyType "${companyType}" yields only ${matches.length} matches (need >= 5)`);
+    const accentSlugs = new Set(accents.map((a) => a.slug));
+    if (!matches.some((m) => accentSlugs.has(m.slug))) {
+      fail(`companyType "${companyType}" produced no accent skill — companyType not steering selection`);
+    }
+  }
+  // Ubiquitous core anchors every pack: a no-companyType call surfaces it.
+  for (const core of UBIQUITOUS_CORE) {
+    if (!slugs.has(core.slug)) fail(`UBIQUITOUS_CORE references unknown slug: ${core.slug}`);
+  }
+  const bareMatches = matchSkills({ roleCategory: "other", companyType: null });
+  const coreSlugs = new Set(UBIQUITOUS_CORE.map((c) => c.slug));
+  if (!bareMatches.every((m) => coreSlugs.has(m.slug))) {
+    fail("a no-companyType 'other' pack should be entirely ubiquitous-core skills");
+  }
+
   console.log(
     `fsga:check OK — ${SKILLS.length} skills across ${SKILL_CATEGORIES.length} categories; ` +
       `all ${ROLE_CATEGORIES.length} role categories yield >= 5 matches; all rule-table slugs valid.`,
   );
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
