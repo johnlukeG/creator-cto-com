@@ -8,7 +8,7 @@
 import { Pill } from "@/components/atoms";
 import type { ReactNode } from "react";
 import type { Skill, SkillCategory } from "@/lib/fsga/skills/types";
-import { CopyButton } from "./copy-button";
+import { SkillActions } from "./skill-actions";
 
 const CATEGORY_LABELS: Record<SkillCategory, string> = {
   "executive-founder": "Executive / Founder",
@@ -38,15 +38,17 @@ export function SkillCard({
   skill,
   customReason,
   recommendedFirst = false,
+  isSignature = false,
   rank,
 }: {
   skill: Skill;
   customReason?: string | null;
   recommendedFirst?: boolean;
+  isSignature?: boolean;
   rank?: number;
 }) {
   return (
-    <div className="bg-bg-card border border-line rounded-[18px] p-5 sm:p-7">
+    <div className={`bg-bg-card border rounded-[18px] p-5 sm:p-7 ${isSignature ? "border-accent" : "border-line"}`}>
       {/* Header row */}
       <div className="flex flex-wrap items-center gap-2">
         {typeof rank === "number" && (
@@ -59,6 +61,7 @@ export function SkillCard({
         <Pill variant="chip">{DIFFICULTY_LABELS[skill.difficulty]}</Pill>
         {skill.riskLevel === "medium" && <Pill variant="outline">human review</Pill>}
         {recommendedFirst && <Pill variant="accent">start here</Pill>}
+        {isSignature && <Pill variant="accent">your signature Skill</Pill>}
       </div>
 
       {/* Custom reason */}
@@ -99,15 +102,15 @@ export function SkillCard({
         <WorkflowStep label="Result">{skill.exampleUseCase}</WorkflowStep>
       </div>
 
-      {/* Starter prompt */}
+      {/* Starter prompt + take-it-with-you actions */}
       <div className="mt-5 bg-bg-muted border border-line-soft rounded-xl p-4">
-        <div className="flex items-center justify-between gap-3 mb-2.5">
-          <span className="text-[10px] tracking-[0.08em] uppercase text-ink-faint">Starter prompt</span>
-          <CopyButton text={skill.starterPrompt} label="copy prompt" />
-        </div>
+        <div className="text-[10px] tracking-[0.08em] uppercase text-ink-faint mb-2.5">Starter prompt</div>
         <p className="font-mono text-[12px] text-ink-muted leading-[1.6] whitespace-pre-wrap">
           {skill.starterPrompt}
         </p>
+        <div className="mt-4 pt-4 border-t border-line-soft">
+          <SkillActions skill={skill} />
+        </div>
       </div>
     </div>
   );

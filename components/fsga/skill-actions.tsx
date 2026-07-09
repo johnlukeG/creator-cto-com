@@ -52,7 +52,7 @@ export function SkillActions({ skill }: { skill: Skill }) {
         download Skill (.md)
       </button>
       <Btn href={`/fsga/build-your-own${buildYourOwnQuery(skill)}`} variant="primary">
-        Make this your Skill →
+        Make this your Skill
       </Btn>
     </div>
   );
