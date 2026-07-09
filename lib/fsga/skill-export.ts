@@ -38,6 +38,12 @@ export function compileSkillPrompt(skill: Skill): string {
   ].join("\n");
 }
 
+// Double-quote a YAML scalar so colons, #, etc. in prose can't break the
+// frontmatter mapping. Escapes backslash and double-quote per YAML spec.
+function yamlString(value: string): string {
+  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+
 /**
  * A real SKILL.md — YAML frontmatter + body — mirroring the Anthropic Skill
  * folder shape the workshop teaches. The attendee downloads this and can drop
@@ -47,8 +53,8 @@ export function compileSkillFile(skill: Skill): string {
   const bullets = (items: string[]) => items.map((i) => `- ${i}`).join("\n");
   const steps = skill.processSteps.map((s, i) => `${i + 1}. ${s}`).join("\n");
   return `---
-name: ${skill.slug}
-description: ${skill.description}
+name: ${yamlString(skill.slug)}
+description: ${yamlString(skill.description)}
 ---
 
 # ${skill.name}

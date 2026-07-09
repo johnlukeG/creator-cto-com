@@ -95,6 +95,15 @@ async function main(): Promise<void> {
   if (!md.startsWith("---\nname: ")) fail("compileSkillFile missing YAML frontmatter");
   if (!md.includes("\n## Process\n") || !md.includes("\n## Starter prompt\n")) fail("compileSkillFile missing required sections");
 
+  const colonSkill = SKILLS.find((s) => s.description.includes(": "));
+  if (colonSkill) {
+    const colonMd = exp.compileSkillFile(colonSkill);
+    const descLine = colonMd.split("\n").find((l) => l.startsWith("description:"));
+    if (!descLine || !descLine.startsWith('description: "') || !descLine.endsWith('"')) {
+      fail(`compileSkillFile did not YAML-quote a colon-containing description: ${descLine}`);
+    }
+  }
+
   const prompt = exp.compileSkillPrompt(sample!);
   if (!prompt.includes(sample!.name) || prompt.trim() === "") fail("compileSkillPrompt produced empty/nameless output");
 
