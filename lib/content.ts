@@ -55,3 +55,42 @@ export const faq = [
   { q: "Is there a paid offering?", a: "Not yet. Everything lives on YouTube and it's free. If we build tools or resources worth sharing down the line, we'll point you to them." },
 ];
 
+export const about = {
+  meta: {
+    label: "● / about",
+    system: "creatorcto.system / built in public",
+    version: "v0.1 — 2026",
+  },
+  context: {
+    eyebrow: "/ about",
+    title: "Why this channel exists.",
+    paragraphs: [
+      "The internet used to reward creators for attention. The AI era rewards something else — creators who turn that attention into systems and products they actually own.",
+      "Creator CTO documents that shift: the move from content creator to AI-native builder and operator. Real builds, real tradeoffs, in public. No hype, no magic — just the process of turning an audience into durable assets.",
+    ],
+  },
+  bio: {
+    eyebrow: "/ who's behind it",
+    title: "Built around a builder, not a brand.",
+    paragraphs: [
+      "I'm JL — I build products and document the process. Creator CTO isn't a media company with a content calendar; it's me, building real things and showing the work.",
+      'Most "AI for creators" content stops at the demo. I care about the parts that don\'t fit in a highlight reel: the architecture decisions, the dead ends, the boring infrastructure that makes an owned product actually work. [[TODO: confirm — your background / what you build: e.g. years shipping software, notable projects, prior role]]',
+      "If it helps one creator ship something they own, the channel is doing its job.",
+    ],
+  },
+  audience: {
+    eyebrow: "/ who this is for",
+    title: "For creators who want to own the stack.",
+    for: [
+      "Creators with an audience who want owned products, not just brand deals",
+      "Operators and developers building inside creator businesses",
+      "Anyone who wants a clear path from creator → founder → operator",
+    ],
+    notFor: [
+      "Anyone looking for motivation instead of mechanics",
+      "Get-rich-quick or AI-magic narratives",
+      "Pure theory with nothing shipped",
+    ],
+  },
+} as const;
+
