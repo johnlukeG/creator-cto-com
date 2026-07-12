@@ -74,7 +74,7 @@ export const about = {
     title: "Built around a builder, not a brand.",
     paragraphs: [
       "I'm JL — I build products and document the process. Creator CTO isn't a media company with a content calendar; it's me, building real things and showing the work.",
-      'Most "AI for creators" content stops at the demo. I care about the parts that don\'t fit in a highlight reel: the architecture decisions, the dead ends, the boring infrastructure that makes an owned product actually work. [[TODO: confirm — your background / what you build: e.g. years shipping software, notable projects, prior role]]',
+      "Most “AI for creators” content stops at the demo. I care about the parts that don’t fit in a highlight reel: the architecture decisions, the dead ends, the boring infrastructure that makes an owned product actually work. [[TODO: confirm — your background / what you build: e.g. years shipping software, notable projects, prior role]]",
       "If it helps one creator ship something they own, the channel is doing its job.",
     ],
   },

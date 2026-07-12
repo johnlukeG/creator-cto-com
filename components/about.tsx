@@ -12,7 +12,7 @@ export function About() {
       </div>
 
       {/* The context — why this exists */}
-      <Section eyebrow={about.context.eyebrow} title={about.context.title}>
+      <Section eyebrow={about.context.eyebrow} title={about.context.title} titleAs="h1">
         <div className="max-w-[640px] mx-auto flex flex-col gap-4 text-[15px] leading-[1.65] text-ink-muted text-pretty">
           {about.context.paragraphs.map((p, i) => (
             <p key={i} className={i === 0 ? "text-ink" : undefined}>
