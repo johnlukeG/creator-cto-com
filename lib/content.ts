@@ -73,9 +73,9 @@ export const about = {
     eyebrow: "/ who's behind it",
     title: "Built around a builder, not a brand.",
     paragraphs: [
-      "I'm JL — I build products and document the process. Creator CTO isn't a media company with a content calendar; it's me, building real things and showing the work.",
-      "Most “AI for creators” content stops at the demo. I care about the parts that don’t fit in a highlight reel: the architecture decisions, the dead ends, the boring infrastructure that makes an owned product actually work. [[TODO: confirm — your background / what you build: e.g. years shipping software, notable projects, prior role]]",
-      "If it helps one creator ship something they own, the channel is doing its job.",
+      "I'm JL. I build software products, and Creator CTO is where I show the work — in public, as it happens. It isn't a media brand with a content calendar behind it. It's one builder, documenting real projects end to end.",
+      "I've spent the last few years shipping real things — job boards, fantasy-sports platforms, internal tooling — mostly solo, and increasingly with AI carrying a real share of the load. [[TODO: sharpen — drop in your strongest proof point: a flagship product + a concrete result (users, revenue, launch), plus years building or any prior role]]",
+      "That's the premise here. Most “AI for creators” content stops at the demo; I'm more interested in the parts that don't make the highlight reel — the architecture calls, the dead ends, the unglamorous infrastructure that decides whether a product actually holds up. If you're a creator trying to build something you own, that's what I'm documenting for you.",
     ],
   },
   audience: {
