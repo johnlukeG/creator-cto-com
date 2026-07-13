@@ -9,6 +9,7 @@
 // rendering <DeckShell /> with nothing else in the page body.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { TouchEvent as ReactTouchEvent } from "react";
 import { SLIDES } from "@/lib/fsga/deck/slides";
 import type { FeaturedPackData } from "@/lib/fsga/deck/types";
 import { NotesPanel } from "./notes-panel";
@@ -52,6 +53,18 @@ function isTypingTarget(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "VIDEO" || target.isContentEditable;
 }
 
+// Swipe guard: a touch that begins on (or inside) an interactive element —
+// a calculator answer button, the name-it slide, a link, the Matrix <video> —
+// must drive that element, not navigate the deck. Broader than isTypingTarget
+// because it walks up from the touch target to catch children of a <button>.
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (isTypingTarget(target)) return true;
+  if (target instanceof HTMLElement) {
+    return target.closest("button, a, [role='button'], input, textarea") !== null;
+  }
+  return false;
+}
+
 function toggleFullscreen() {
   if (document.fullscreenElement) {
     document.exitFullscreen?.().catch(() => {});
@@ -65,9 +78,14 @@ function toggleFullscreen() {
 export function DeckShell({
   featuredPacks,
   staticMode,
+  navControls = false,
 }: {
   featuredPacks: FeaturedPackData[];
   staticMode: boolean;
+  // Opt-in on-screen navigation (chevron buttons + touch swipe). Off for the
+  // live /fsga/presenter and offline /fsga/static routes so they stay clean;
+  // the public /fsga/slides replay route turns it on.
+  navControls?: boolean;
 }) {
   const [index, setIndex] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -114,6 +132,31 @@ export function DeckShell({
     setStartedAt(Date.now());
     setResetKey((k) => k + 1);
   }, []);
+
+  // Touch swipe → navigate (only wired up when navControls is on). Records the
+  // start point + whether the gesture began on an interactive element; on
+  // release, a mostly-horizontal drag past the threshold flips the slide.
+  const touchRef = useRef<{ x: number; y: number; skip: boolean } | null>(null);
+
+  const onTouchStart = useCallback((event: ReactTouchEvent) => {
+    const t = event.touches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY, skip: isInteractiveTarget(event.target) };
+  }, []);
+
+  const onTouchEnd = useCallback(
+    (event: ReactTouchEvent) => {
+      const start = touchRef.current;
+      touchRef.current = null;
+      if (!start || start.skip) return;
+      const t = event.changedTouches[0];
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+        navigate(dx < 0 ? index + 1 : index - 1);
+      }
+    },
+    [navigate, index],
+  );
 
   // Re-subscribed whenever `index` changes so the handler always closes over
   // the current slide position — the deck only has 18 slides, so re-binding
@@ -167,7 +210,11 @@ export function DeckShell({
   const nextSlide = SLIDES[index + 1] ?? null;
 
   return (
-    <div className="fixed inset-0 z-40 bg-bg overflow-hidden">
+    <div
+      className="fixed inset-0 z-40 bg-bg overflow-hidden"
+      onTouchStart={navControls ? onTouchStart : undefined}
+      onTouchEnd={navControls ? onTouchEnd : undefined}
+    >
       <div
         className="absolute left-1/2 top-1/2 overflow-hidden bg-bg"
         style={{
@@ -203,6 +250,41 @@ export function DeckShell({
           startedAt={startedAt}
           resetKey={resetKey}
         />
+      )}
+
+      {/*
+        On-screen prev/next controls for the public replay route. Rendered
+        outside the scaled stage so they sit at fixed viewport positions (not
+        scaled/translated with the slides). Each edge control hides at the end
+        of its range. Both funnel through the same navigate() as keyboard/swipe.
+      */}
+      {navControls && (
+        <>
+          {index > 0 && (
+            <button
+              type="button"
+              onClick={() => navigate(index - 1)}
+              aria-label="Previous slide"
+              className="fixed left-3 top-1/2 z-50 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-bg-card/80 text-ink-muted backdrop-blur transition-colors hover:border-accent hover:text-ink"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          )}
+          {index < SLIDE_COUNT - 1 && (
+            <button
+              type="button"
+              onClick={() => navigate(index + 1)}
+              aria-label="Next slide"
+              className="fixed right-3 top-1/2 z-50 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-bg-card/80 text-ink-muted backdrop-blur transition-colors hover:border-accent hover:text-ink"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          )}
+        </>
       )}
     </div>
   );

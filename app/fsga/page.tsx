@@ -41,6 +41,14 @@ export default function FsgaHomePage() {
             </div>
           </Link>
         </div>
+
+        <Link
+          href="/fsga/slides"
+          className="mt-3 flex items-center justify-center gap-1.5 rounded-[14px] border border-line-soft px-5 py-3 text-[12px] no-underline hover:border-accent transition-colors"
+        >
+          <span className="font-bold tracking-[-0.03em] text-ink">Replay the slides</span>
+          <span className="text-ink-muted">— missed the workshop? Walk back through the deck.</span>
+        </Link>
       </div>
     </Section>
   );
