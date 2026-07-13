@@ -73,9 +73,9 @@ export const about = {
     eyebrow: "/ who's behind it",
     title: "Built around a builder, not a brand.",
     paragraphs: [
-      "I'm JL. I build software products, and Creator CTO is where I show the work — in public, as it happens. It isn't a media brand with a content calendar behind it. It's one builder, documenting real projects end to end.",
-      "I've spent the last few years shipping real things — job boards, fantasy-sports platforms, internal tooling — mostly solo, and increasingly with AI carrying a real share of the load. [[TODO: sharpen — drop in your strongest proof point: a flagship product + a concrete result (users, revenue, launch), plus years building or any prior role]]",
-      "That's the premise here. Most “AI for creators” content stops at the demo; I'm more interested in the parts that don't make the highlight reel — the architecture calls, the dead ends, the unglamorous infrastructure that decides whether a product actually holds up. If you're a creator trying to build something you own, that's what I'm documenting for you.",
+      "I’m JL. I co-founded Front Yard Fantasy — a fantasy-sports media brand built around interactive shows, games, tools, and community — and Creator CTO is where I show how it all gets built, in public. Through FYF, I’ve produced content for companies across the fantasy-sports and gaming space, including FanDuel and Bettor Sports Network.",
+      "I’ve spent my career at the intersection of sports, media, and product. I was an early employee at PrizePicks, where I helped build the product and engineering team from the ground up, and later served as CTO of BDGE, a creator-led fantasy football media company. Across those roles I’ve built and launched real products for sports audiences — DFS and fantasy platforms, draft guides, rankings tools, job boards, and other fan-facing experiences.",
+      "Today I’m still building products and content through Front Yard Fantasy, and documenting the process here. Most “AI for creators” content stops at the demo; I’m more interested in the parts that don’t make the highlight reel — the architecture calls, the tradeoffs, the unglamorous infrastructure that decides whether a product holds up. Creator CTO is where I help creators, operators, and media teams use AI to build better workflows, products, and audience experiences.",
     ],
   },
   audience: {
