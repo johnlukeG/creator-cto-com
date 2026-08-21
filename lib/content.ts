@@ -55,3 +55,42 @@ export const faq = [
   { q: "Is there a paid offering?", a: "Not yet. Everything lives on YouTube and it's free. If we build tools or resources worth sharing down the line, we'll point you to them." },
 ];
 
+export const about = {
+  meta: {
+    label: "● / about",
+    system: "creatorcto.system / built in public",
+    version: "v0.1 — 2026",
+  },
+  context: {
+    eyebrow: "/ about",
+    title: "Why this channel exists.",
+    paragraphs: [
+      "The internet used to reward creators for attention. The AI era rewards something else — creators who turn that attention into systems and products they actually own.",
+      "Creator CTO documents that shift: the move from content creator to AI-native builder and operator. Real builds, real tradeoffs, in public. No hype, no magic — just the process of turning an audience into durable assets.",
+    ],
+  },
+  bio: {
+    eyebrow: "/ who's behind it",
+    title: "Built around a builder, not a brand.",
+    paragraphs: [
+      "I’m JL. I co-founded Front Yard Fantasy — a fantasy-sports media brand built around interactive shows, games, tools, and community — and Creator CTO is where I show how it all gets built, in public. Through FYF, I’ve produced content for companies across the fantasy-sports and gaming space, including FanDuel and Bettor Sports Network.",
+      "I’ve spent my career at the intersection of sports, media, and product. I was an early employee at PrizePicks, where I helped build the product and engineering team from the ground up, and later served as CTO of BDGE, a creator-led fantasy football media company. Across those roles I’ve built and launched real products for sports audiences — DFS and fantasy platforms, draft guides, rankings tools, job boards, and other fan-facing experiences.",
+      "Today I’m still building products and content through Front Yard Fantasy, and documenting the process here — the architecture calls, the tradeoffs, the unglamorous infrastructure that decides whether a product actually holds up. Creator CTO is where I help creators, operators, and media teams use AI to build better workflows, products, and audience experiences.",
+    ],
+  },
+  audience: {
+    eyebrow: "/ who this is for",
+    title: "For creators who want to own the stack.",
+    for: [
+      "Creators with an audience who want owned products, not just brand deals",
+      "Operators and developers building inside creator businesses",
+      "Anyone who wants a clear path from creator → founder → operator",
+    ],
+    notFor: [
+      "Anyone looking for motivation instead of mechanics",
+      "Get-rich-quick or AI-magic narratives",
+      "Pure theory with nothing shipped",
+    ],
+  },
+} as const;
+

@@ -10,6 +10,7 @@ export function Section({
   title,
   sub,
   pad = "normal",
+  titleAs = "h2",
 }: {
   children: ReactNode;
   id?: string;
@@ -17,8 +18,10 @@ export function Section({
   title?: string;
   sub?: string;
   pad?: "normal" | "tight";
+  titleAs?: "h1" | "h2";
 }) {
   const padY = pad === "tight" ? 40 : 62;
+  const Heading = titleAs;
   return (
     <section id={id} className="px-7 sm:px-14" style={{ paddingTop: padY, paddingBottom: padY }}>
       {(eyebrow || title) && (
@@ -29,9 +32,9 @@ export function Section({
             </div>
           )}
           {title && (
-            <h2 className="text-[36px] font-bold tracking-[-0.03em] mx-auto max-w-[760px] leading-[1.05] text-balance">
+            <Heading className="text-[36px] font-bold tracking-[-0.03em] mx-auto max-w-[760px] leading-[1.05] text-balance">
               {title}
-            </h2>
+            </Heading>
           )}
           {sub && (
             <p className="text-[14px] text-ink-muted max-w-[540px] mx-auto mt-3.5 leading-[1.55] text-pretty">
