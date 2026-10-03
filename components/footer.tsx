@@ -1,8 +1,22 @@
+import Link from "next/link";
 import { Logo } from "./atoms";
+import { LINKS } from "@/lib/content";
 
 const cols = [
-  { h: "Channel", items: ["YouTube", "About"] },
-  { h: "Connect", items: ["X / Twitter", "LinkedIn"] },
+  {
+    h: "Channel",
+    items: [
+      { label: "YouTube", href: LINKS.youtube },
+      { label: "About", href: "/about" },
+    ],
+  },
+  {
+    h: "Connect",
+    items: [
+      { label: "X / Twitter", href: "#" },
+      { label: "LinkedIn", href: "#" },
+    ],
+  },
 ];
 
 export function Footer() {
@@ -20,10 +34,10 @@ export function Footer() {
             <div className="text-[10.5px] tracking-[0.06em] uppercase text-ink-faint mb-3.5">{col.h}</div>
             <ul className="list-none p-0 m-0 grid gap-2">
               {col.items.map((i) => (
-                <li key={i}>
-                  <a href="#" className="text-ink no-underline text-[12.5px] hover:text-accent">
-                    {i}
-                  </a>
+                <li key={i.label}>
+                  <Link href={i.href} className="text-ink no-underline text-[12.5px] hover:text-accent">
+                    {i.label}
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -3,8 +3,9 @@ import { Btn, Logo } from "./atoms";
 import { LINKS } from "@/lib/content";
 
 const navLinks = [
-  { label: "What we cover", href: "#pillars" },
-  { label: "FAQ", href: "#faq" },
+  { label: "What we cover", href: "/#pillars" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "About", href: "/about" },
 ];
 
 export function Nav() {
